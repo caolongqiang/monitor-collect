@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <context:property-placeholder location="classpath*:*.properties" file-encoding="UTF-8"/>
+    <context:component-scan base-package="com.jimu.monitor.collect"/>
+
+    <bean id="configs" class="com.jimu.monitor.collect.Configs">
+        <property name="monitorPath" value="${monitor.collect.path}"/>
+        <property name="monitorDBUrl" value="${influxdb.url}"/>
+        <property name="monitorDBUsername" value="${influxdb.username}"/>
+        <property name="monitorDBPassword" value="${influxdb.password}"/>
+        <property name="monitorDBName" value="${influxdb.dbName}"/>
+    </bean>
+
+    <tx:annotation-driven/>
+
+    <task:executor id="executor" pool-size="10"/>
+    <task:scheduler id="scheduler" pool-size="10"/>
+    <task:annotation-driven executor="executor" scheduler="scheduler"/>
+
+    <task:scheduled-tasks scheduler="scheduler">
+        <task:scheduled ref="monitorScheduler" method="run" fixed-delay="60000"/><!-- 5 mins -->
+    </task:scheduled-tasks>
+</beans>

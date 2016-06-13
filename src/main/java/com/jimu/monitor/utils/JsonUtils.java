@@ -1,4 +1,4 @@
-package com.jimu.monitor.collect.utils;
+package com.jimu.monitor.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;

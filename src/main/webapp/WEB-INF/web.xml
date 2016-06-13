@@ -77,4 +77,15 @@
         <servlet-name>monitor</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>DisplayMetricServlet</servlet-name>
+        <servlet-class>com.jimu.common.jmonitor.support.http.DisplayMetricServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DisplayMetricServlet</servlet-name>
+        <url-pattern>/_metrics/*</url-pattern>
+    </servlet-mapping>
+
 </web-app>

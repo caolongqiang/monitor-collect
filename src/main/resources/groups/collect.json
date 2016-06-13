@@ -1,0 +1,15 @@
+{
+  "name": "groupname2",
+  "department" : "depart2",
+  "domainList": [
+    {
+      "host": "collect7",
+      "url": "http://127.0.0.1:8080/random1.jsp"
+    },
+    {
+      "host": "collect8",
+      "url": "http://127.0.0.1:8080/random1.jsp"
+    }
+  ],
+  "type": "HTTP"
+}

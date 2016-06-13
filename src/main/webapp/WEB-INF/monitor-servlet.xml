@@ -10,6 +10,8 @@
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
 
-    <context:component-scan base-package="com.jimu.monitor.collect"/>
-    <context:component-scan base-package="com.jimu.monitor.collect"/>
+    <!-- webapp里的*servlet 一定只能扫描controller的代码, 否则会造成一些bean会初始化两次 -->
+    <context:component-scan base-package="com.jimu.monitor.collect" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
 </beans>

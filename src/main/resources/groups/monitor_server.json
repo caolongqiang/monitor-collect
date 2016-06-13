@@ -1,0 +1,11 @@
+{
+  "name": "monitor_server",
+  "department": "jstock",
+  "domainList": [
+    {
+      "host": "grafana-host",
+      "url": "http://127.0.0.1:8080/_metrics/"
+    }
+  ],
+  "type": "HTTP"
+}

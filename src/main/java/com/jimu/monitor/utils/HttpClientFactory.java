@@ -1,17 +1,13 @@
-package com.jimu.monitor.collect.utils;
+package com.jimu.monitor.utils;
 
-import com.google.common.collect.Lists;
-import org.apache.http.*;
-import org.apache.http.client.RedirectStrategy;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +15,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by yue.liu on 16/4/15.
  */
-
-
 public class HttpClientFactory {
     private static final Logger log = LoggerFactory.getLogger(HttpClientFactory.class);
 
@@ -35,11 +29,8 @@ public class HttpClientFactory {
             return;
         }
 
-
         RequestConfig requestConfig = getRequestConfig();
-
         PoolingHttpClientConnectionManager poolingHttpClientConnectionManager = getPoolingHttpClientConnectionManager();
-
         ConnectionKeepAliveStrategy connectionKeepAliveStrategy = getConnectionKeepAliveStrategy();
 
         httpClient = HttpClientBuilder.create()
@@ -60,11 +51,10 @@ public class HttpClientFactory {
 
     private static RequestConfig getRequestConfig() {
         return RequestConfig.custom()
-                .setSocketTimeout(2000)
-                .setConnectTimeout(1000)
+                .setSocketTimeout(20000)
+                .setConnectTimeout(10000)
                 .setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
                 .build();
-
     }
 
     private static ConnectionKeepAliveStrategy getConnectionKeepAliveStrategy() {

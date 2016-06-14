@@ -62,7 +62,7 @@ public class HttpCombiner implements Combiner {
     }
 
     /**
-     * 计算单机指标值. 以_time结算的, 需要除以1E6, 变成毫秒 以_count结尾的, 要除以60, 变成qps
+     * 计算单机指标值. 以_count结尾的, 要除以60, 变成qps
      */
     private static class DomainMetricCalculator implements Supplier<Map> {
         private Packet packet;
@@ -79,7 +79,7 @@ public class HttpCombiner implements Combiner {
          * <p>
          */
         Map<Predicate<String>, Function<Double, Double>> transformer = ImmutableMap.of(
-                (key) -> StringUtils.endsWithIgnoreCase(key, "_TIME"), (value) -> value / 1E6,
+               // (key) -> StringUtils.endsWithIgnoreCase(key, "_TIME"), (value) -> value / 1E6,
 
                 (key) -> StringUtils.endsWithIgnoreCase(key, "_COUNT")
                         || StringUtils.endsWithIgnoreCase(key, "_CNT")
@@ -120,6 +120,7 @@ public class HttpCombiner implements Combiner {
 
         static Set<String> needAvgSuffixes = ImmutableSet.of("_Time", "_CACHE_Value", "_RADIO_L_Value", "_RADIO_Value");
 
+        // TODO 这段代码好像没有必要了
         static Set<String> needAvgMetrics = ImmutableSet.of("JVM_MarkSweepCompact_Count", "JVM_Copy_Count",
                 "JVM_PS_MarkSweep_Count", "JVM_ConcurrentMarkSweep_Count", "JVM_ParNew_Count", "JVM_PS_Scavenge_Count");
 

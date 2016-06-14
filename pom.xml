@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>jimu</groupId>
-    <artifactId>monitor_server</artifactId>
+    <groupId>com.jimu.common</groupId>
+    <artifactId>jmonitor</artifactId>
     <packaging>war</packaging>
     <version>1.0</version>
-    <name>monitor_server Maven Webapp</name>
+    <name>jmonitor_collector</name>
     <url>http://maven.apache.org</url>
     <properties>
         <org.springframework.version>4.2.0.RELEASE</org.springframework.version>
@@ -389,21 +389,9 @@
     <!--profiles-->
     <profiles>
         <profile>
-            <id>local</id>
-            <properties>
-                <deploy.type>local</deploy.type>
-            </properties>
-        </profile>
-        <profile>
             <id>dev</id>
             <properties>
                 <deploy.type>dev</deploy.type>
-            </properties>
-        </profile>
-        <profile>
-            <id>beta</id>
-            <properties>
-                <deploy.type>beta</deploy.type>
             </properties>
         </profile>
         <profile>

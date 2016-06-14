@@ -100,12 +100,14 @@ Grafana 是一款开源的图形控制台, 展示 Graphite 的数据和图片
 #### 在代码里计数
 
 - 监控次数
+
 ```
 JMonitor.recordOne("monitor_timer_task_success");
 
 JMonitor.incrRecord("monitor_timer_task_success2", 10); // 也可以用这个api, 每次增加10个count
 
 ```
+
 一分钟之后, 会在dashboard里看到这个数据.
 ![image_1al6n61kt1ohn1feiejo8u9pjj3g.png-121.9kB][3]
 
@@ -117,12 +119,14 @@ JMonitor.incrRecord("monitor_timer_task_success2", 10); // 也可以用这个api
 对于集群来说, qps等于各台机器的qps之和
 
 - 监控时间
+
 ```
  Stopwatch stopwatch = Stopwatch.createStarted();
   // 其他操作
  stopwatch.stop();
  JMonitor.recordOne("carbon_write", stopwatch.elapsed(TimeUnit.MILLISECONDS));  // 记录数据
 ```
+
 会生成两个指标  `carbon_write_count` 和 `carbon_write_Time`. 也会在grafana里生成两张图
 
 ![carbon_write_time][4]
@@ -135,6 +139,7 @@ carbon_write_time的时间是, 这一分钟里,每次操作的*平均*时间.
 ![carbon_write_count][5]
 
 - 记录绝对值
+
 ```
 JMonitor.recordSize("Thread_num",200);  // 底层记录为 Thread_num_value.
 ```
@@ -155,6 +160,7 @@ JMonitor.recordSize("Thread_num",200);  // 底层记录为 Thread_num_value.
 ![dashboard的名字][6]
 
 取决于你的配置文件.
+
 ```
 {
   "name": "groupname2",   // 服务组的名字

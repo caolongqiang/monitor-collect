@@ -55,10 +55,10 @@ Grafana 是一款开源的图形控制台, 展示 Graphite 的数据和图片
 #### 一 引用jar包
 ```
 在pom.xml里 增加
-<dependency>
+<dependency>
     <groupId>com.jimu.common</groupId>
     <artifactId>jmonitor</artifactId>
-    <version>1.0.1</version>
+    <version>${新的版本}</version>
 </dependency>
 ```
 #### 二 在web.xml里增加配置
@@ -154,7 +154,7 @@ JMonitor.recordSize("Thread_num",200);  // 底层记录为 Thread_num_value.
 
 ## 如何看图
 - grafana的url地址:
-   http://grafana-test.jimubox.com/.
+   http://monitor.jimubox.com/.
 
 - dashboard的名字
 ![dashboard的名字][6]

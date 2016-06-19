@@ -64,4 +64,7 @@ public enum Configs {
 
     public boolean isMonitorAutoRefresh() { return "true".equalsIgnoreCase(properties.getProperty("monitor.autorefresh", "").trim());}
 
+    public String getEtcdApi() { return properties.getProperty("etcd.api", "").trim();}
+
+
 }

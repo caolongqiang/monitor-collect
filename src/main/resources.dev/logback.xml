@@ -22,6 +22,7 @@
     </appender>
 
     <logger name="com.jimu.monitor.collect.LogStorer" level="DEBUG" />
+    <logger name="com.jimu.monitor.collect.MonitorGroupInEtcdKeeper" level="DEBUG" />
 
     <root level="INFO">
         <appender-ref ref="console"/>

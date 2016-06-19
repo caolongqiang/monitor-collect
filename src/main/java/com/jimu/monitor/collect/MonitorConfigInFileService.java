@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -25,7 +23,6 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -41,10 +38,12 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 /**
  * Created by yue.liu on 16/5/22.
+ * 现在改成从远程接口读取所有需要拉的数据了, 不再从文件里读取配置
  */
 @Slf4j
 @Service
-public class MonitorFileAutoLoaderService {
+@Deprecated
+public class MonitorConfigInFileService implements MonitorGroupKeeper {
 
     private static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(1);
 
@@ -73,7 +72,7 @@ public class MonitorFileAutoLoaderService {
      *
      * @throws Exception
      */
-    @PostConstruct
+    // @PostConstruct
     public void init() throws Exception {
 
         watchService = FileSystems.getDefault().newWatchService();

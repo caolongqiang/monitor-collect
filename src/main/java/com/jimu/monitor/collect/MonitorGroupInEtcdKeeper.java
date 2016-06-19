@@ -125,7 +125,7 @@ public class MonitorGroupInEtcdKeeper implements MonitorGroupKeeper {
         Stopwatch stopwatch = Stopwatch.createStarted();
 
         String content = HttpClientHelper.get(config.getEtcdApi());
-        log.debug("crawl ectd api content:{}", content);
+        log.debug("crawl ectd api {}, content:{}", config.getEtcdApi(), content);
         if (content == null) {
             log.warn("error in get etcd api content. content is null. api address is:{}", config.getEtcdApi());
             JMonitor.incrRecord("etcd api size", 0, stopwatch.elapsed(TimeUnit.MILLISECONDS));
@@ -150,6 +150,5 @@ public class MonitorGroupInEtcdKeeper implements MonitorGroupKeeper {
             return Lists.newArrayList();
         }
     }
-
 
 }

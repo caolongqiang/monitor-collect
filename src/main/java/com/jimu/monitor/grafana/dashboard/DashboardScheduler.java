@@ -6,6 +6,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
+import com.google.common.base.Stopwatch;
+import com.jimu.common.jmonitor.JMonitor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import static com.jimu.monitor.Configs.config;
 
 /**
- * 调度服务的入口, 读取任务
- * Created by zhenbao.zhou on 2016/5/25
+ * 调度服务的入口, 读取任务 Created by zhenbao.zhou on 2016/5/25
  */
 
 @Service
@@ -23,20 +25,22 @@ public class DashboardScheduler {
 
     private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
-    @PostConstruct
-    public void init() throws Exception {
-        log.info("start init DashboardScheduler");
+    @Scheduled(cron = "5 */2 * * * ?") // 每2分钟的第1s执行一次
+    public void job() throws Exception {
+        log.info("start DashboardScheduler");
 
-        // 定期钟执行一次生成dashboard的定时任务. 线上是30分钟
-        scheduledExecutorService.scheduleAtFixedRate(() -> {
-            try {
-               DashboardMaintainer maintainer = new DashboardMaintainer();
-                maintainer.run();
-            } catch (Throwable e) {
-                log.error("error in run DashboardMaintainer", e);
-            }
-        }, 2, config.getDbRefreshIntervalInMin(), TimeUnit.MINUTES);
+        // 每两分钟钟执行一次生成dashboard的定时任务.
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        try {
+            DashboardMaintainer maintainer = new DashboardMaintainer();
+            maintainer.run();
+        } catch (Throwable e) {
+            log.error("error in run DashboardMaintainer", e);
+            JMonitor.recordOne("dashboard scheduler error");
+        }
 
-        log.info("end init DashboardScheduler");
+        JMonitor.recordOne("dashboard scheduler", stopwatch.elapsed(TimeUnit.MILLISECONDS));
+
+        log.info("stop DashboardScheduler");
     }
 }

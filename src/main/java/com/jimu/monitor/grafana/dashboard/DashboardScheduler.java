@@ -25,6 +25,7 @@ public class DashboardScheduler {
 
     private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
+    // TODO 每2分钟全量刷新一次dashboard, 这个将来可能会有性能问题, 造成grafana压力过大.
     @Scheduled(cron = "5 */2 * * * ?") // 每2分钟的第1s执行一次
     public void job() throws Exception {
         log.info("start DashboardScheduler");

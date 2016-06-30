@@ -13,12 +13,12 @@ public class Filter {
     /**
      * 部门名字
      */
-    String department;
+    String app;
 
     /**
      * 组名
      */
-    String groupname;
+    String env;
 
     /**
      * 状态.  0:表示有效, 其他表示无效

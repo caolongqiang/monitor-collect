@@ -1,5 +1,7 @@
 package com.jimu.monitor.collect;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.jimu.common.jmonitor.JMonitor;
 import com.jimu.monitor.collect.bean.Group;
@@ -29,6 +31,9 @@ public class MonitorScheduler {
     @Resource(name = "monitorGroupInEtcdKeeper")
     private MonitorGroupKeeper groupKeeper;
 
+    @Resource(name = "monitorConfigInFileService")
+    private MonitorGroupKeeper fileGroupKeeper;
+
     // 无界队列,不丢弃采集任务
     private Executor threadPoolExecutor = Executors.newFixedThreadPool(100);
 
@@ -36,12 +41,10 @@ public class MonitorScheduler {
     public void scheduleJob() {
         log.info("start scheduleJob");
         try {
-            List<Group> groupList = groupKeeper.getGroupList();
-            if (log.isDebugEnabled()) {
-                log.debug("current scheduler, groupList size:{}", groupList.size());
-            }
+            Iterable<Group> groupIterable = Iterables.unmodifiableIterable(
+                    Iterables.concat(groupKeeper.getGroupList(), fileGroupKeeper.getGroupList()));
 
-            for (Group group : groupList) {
+            for (Group group : groupIterable) {
                 threadPoolExecutor.execute(TimerTaskFactory.of(group));// 马上执行收集各个group
             }
             JMonitor.recordOne("monitor_scheduler_init_success");

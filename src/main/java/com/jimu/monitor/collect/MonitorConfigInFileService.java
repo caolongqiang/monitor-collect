@@ -38,11 +38,10 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 /**
  * Created by yue.liu on 16/5/22.
- * 现在改成从远程接口读取所有需要拉的数据了, 不再从文件里读取配置
+ * 现在改成主要从远程接口读取所有需要拉的数据了, 不再从文件里读取配置
  */
 @Slf4j
 @Service
-@Deprecated
 public class MonitorConfigInFileService implements MonitorGroupKeeper {
 
     private static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(1);

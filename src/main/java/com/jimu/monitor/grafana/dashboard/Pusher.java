@@ -74,7 +74,8 @@ public enum Pusher {
     }
 
     /**
-     * 这个post方法封装的很垃圾, 但是我没想好怎么封装成一个公有的逻辑(理论上来说,应该都在httpclienthelper里). 先放在pusher类里, 设置为private
+     * 这个post方法封装的很垃圾, 但是我没想好怎么封装成一个公有的逻辑(理论上来说,应该都在httpclienthelper里).
+     * 先放在pusher类里, 设置为private
      *
      * @param url
      * @param content
@@ -87,7 +88,7 @@ public enum Pusher {
 
         log.debug("url is:{},  content is {}, headerMap is :{}", url, content, headerMap.size());
 
-        HttpEntity entity = null;
+        HttpEntity entity;
         HttpPost post = new HttpPost(url);
         CloseableHttpClient httpClient = HttpClientFactory.getHttpClient();
         String result = StringUtils.EMPTY;

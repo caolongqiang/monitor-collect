@@ -7,7 +7,7 @@
     <select id="queryAvailableFilterList"
             resultType="com.jimu.monitor.collect.db.Filter">
         SELECT
-        id, department, groupname, status
+        id, app, env, status
         FROM
         filter
         WHERE

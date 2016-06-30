@@ -97,7 +97,7 @@ public class DashboardMaintainer implements Runnable {
      */
     private List<RenderDbParam> fillRenderParam(List<String[]> metrics) {
         Preconditions.checkNotNull(metrics);
-        metrics.forEach(metric -> Preconditions.checkArgument(metric.length == 5, "每个数字的长度必须为5"));
+        metrics.forEach(metric -> Preconditions.checkArgument(metric.length == 5, "每个指标的长度必须为5"));
 
         log.info("start fill render param. metrics size:{}", metrics.size());
 

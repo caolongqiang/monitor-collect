@@ -1,7 +1,7 @@
 package com.jimu.monitor.collect.controller;
 
-import com.jimu.monitor.collect.MonitorConfigInFileService;
-import com.jimu.monitor.collect.MonitorGroupInEtcdKeeper;
+import com.jimu.monitor.collect.monitorkeeper.MonitorConfigInFileService;
+import com.jimu.monitor.collect.monitorkeeper.MonitorGroupInEtcdKeeper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -29,13 +29,13 @@ public class MonitorConfigController {
 
     @RequestMapping("reloadDBFilter.j")
     public @ResponseBody String reloadDBFilter() throws Exception {
-        monitorGroupInEtcdKeeper.reloadDBFilter();
+        //monitorGroupInEtcdKeeper.reloadDBFilter();
         return "reload db filter success";
     }
 
     @RequestMapping("reloadEtcdConfig.j")
     public @ResponseBody String reloadEtcdConfig() throws Exception {
-        monitorGroupInEtcdKeeper.refresh();
+       // monitorGroupInEtcdKeeper.refresh();
         return "reload reloadEtcdConfig success";
     }
 }

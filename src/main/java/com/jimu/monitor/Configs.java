@@ -1,15 +1,13 @@
 package com.jimu.monitor;
 
-import static com.google.common.io.Resources.asCharSource;
-import static com.google.common.io.Resources.getResource;
+import com.google.common.base.Charsets;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.annotation.ThreadSafe;
 
 import java.util.Properties;
 
-import org.apache.http.annotation.ThreadSafe;
-
-import com.google.common.base.Charsets;
-
-import lombok.extern.slf4j.Slf4j;
+import static com.google.common.io.Resources.asCharSource;
+import static com.google.common.io.Resources.getResource;
 
 /**
  * Created by yue.liu on 16/5/22.
@@ -54,17 +52,32 @@ public enum Configs {
         return properties.getProperty("vm.newdb.template", "").trim();
     }
 
-    public String getGraphiteApi() { return properties.getProperty("graphite.api", "").trim();}
+    public String getGraphiteApi() {
+        return properties.getProperty("graphite.api", "").trim();
+    }
 
-    public String getGrafanaApiUri() { return properties.getProperty("grafana.api.uri", "").trim();}
+    public String getGrafanaApiUri() {
+        return properties.getProperty("grafana.api.uri", "").trim();
+    }
 
-    public String getGrafanaAuthorization() { return properties.getProperty("grafana.api.authorization", "").trim();}
+    public String getGrafanaAuthorization() {
+        return properties.getProperty("grafana.api.authorization", "").trim();
+    }
 
-    public int getDbRefreshIntervalInMin() { return Integer.parseInt(properties.getProperty("dashboard.refresh.interval", "").trim());}
+    public int getDbRefreshIntervalInMin() {
+        return Integer.parseInt(properties.getProperty("dashboard.refresh.interval", "").trim());
+    }
 
-    public boolean isMonitorAutoRefresh() { return "true".equalsIgnoreCase(properties.getProperty("monitor.autorefresh", "").trim());}
+    public boolean isMonitorAutoRefresh() {
+        return "true".equalsIgnoreCase(properties.getProperty("monitor.autorefresh", "").trim());
+    }
 
-    public String getEtcdApi() { return properties.getProperty("etcd.api", "").trim();}
+    public String getEtcdContentApi() {
+        return properties.getProperty("etcd.content.api", "").trim();
+    }
 
+    public String getEtcdEventApi() {
+        return properties.getProperty("etcd.event.api", "").trim();
+    }
 
 }

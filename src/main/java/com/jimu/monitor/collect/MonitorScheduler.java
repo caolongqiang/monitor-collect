@@ -1,22 +1,19 @@
 package com.jimu.monitor.collect;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.jimu.common.jmonitor.JMonitor;
 import com.jimu.monitor.collect.bean.Group;
+import com.jimu.monitor.collect.monitorkeeper.MonitorGroupKeeper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 调度服务的入口, 读取任务 Created by zhenbao.zhou on 2016/5/25

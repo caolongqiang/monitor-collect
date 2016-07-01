@@ -1,8 +1,9 @@
-package com.jimu.monitor.collect;
+package com.jimu.monitor.collect.monitorkeeper;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.jimu.monitor.collect.bean.Group;
+import com.jimu.monitor.collect.monitorkeeper.MonitorGroupKeeper;
 import com.jimu.monitor.utils.JsonUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,6 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;

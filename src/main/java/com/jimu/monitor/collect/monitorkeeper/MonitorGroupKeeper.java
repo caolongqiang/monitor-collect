@@ -1,4 +1,4 @@
-package com.jimu.monitor.collect;
+package com.jimu.monitor.collect.monitorkeeper;
 
 import com.jimu.monitor.collect.bean.Group;
 

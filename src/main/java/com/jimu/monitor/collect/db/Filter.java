@@ -11,12 +11,12 @@ public class Filter {
     int id;
 
     /**
-     * 部门名字
+     * 部门名
      */
     String app;
 
     /**
-     * 组名
+     * 环境名
      */
     String env;
 
@@ -24,4 +24,5 @@ public class Filter {
      * 状态.  0:表示有效, 其他表示无效
      */
     int status;
+
 }

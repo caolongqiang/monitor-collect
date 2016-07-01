@@ -31,28 +31,5 @@ public class EtcdResult {
     String host;
     String app_heck;
 
-    public Optional<String> generateUrl() {
-        Map<String, String> portMap = JsonUtils.readValue(ports, Map.class);
-        if (portMap == null || portMap.size() < 0) {
-            log.error("ports 转换异常. ports:{}, etcdResult:{}", ports, this);
-            JMonitor.recordOne("etcd_ports_change_error");
-            return Optional.absent();
-        }
-
-        try {
-            String key = portMap.keySet().toArray()[0].toString();
-            String portValue = key.split("/")[0];
-            int port = Integer.parseInt(portValue);
-            return Optional.of("http://" + ip + ":" + port + "/_metric/monitor.do");
-        } catch (Exception e) {
-            // 有时返回的数据里, 没有port, 是正常的
-            return Optional.absent();
-        }
-    }
-
-    public String uniqKey() {
-        return env + "__" + app;
-    }
-
 }
 

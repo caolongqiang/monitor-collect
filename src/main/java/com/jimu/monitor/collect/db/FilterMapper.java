@@ -1,5 +1,7 @@
 package com.jimu.monitor.collect.db;
 
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -13,5 +15,15 @@ public interface FilterMapper {
      * @return
      */
     List<Filter> queryAvailableFilterList();
+
+    /**
+     * 查出所有filter
+     * @return
+     */
+    List<Filter> finaAllFilter();
+
+    int updateFilter(Filter filter);
+
+    int insertFilter(@Param("app") String app, @Param("env") String env);
 
 }

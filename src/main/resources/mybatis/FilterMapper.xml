@@ -3,7 +3,6 @@
 <mapper namespace="com.jimu.monitor.collect.db.FilterMapper">
 
 
-
     <select id="queryAvailableFilterList"
             resultType="com.jimu.monitor.collect.db.Filter">
         SELECT
@@ -14,4 +13,33 @@
         status = 0
     </select>
 
-    </mapper>
+    <select id="finaAllFilter"
+            resultType="com.jimu.monitor.collect.db.Filter">
+        SELECT
+        id, app, env, status
+        FROM
+        filter order by id desc;
+    </select>
+
+    <update id="updateFilter"
+            parameterType="com.jimu.monitor.collect.db.Filter">
+        update filter
+        <set>
+            <if test="app != null">
+                app = #{app},
+            </if>
+            <if test="env != null">
+                env = #{env},
+            </if>
+            status = #{status},
+            last_update = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <insert id="insertFilter"
+            parameterType="map">
+        insert into filter(app, env) value (#{app}, #{env});
+    </insert>
+
+</mapper>

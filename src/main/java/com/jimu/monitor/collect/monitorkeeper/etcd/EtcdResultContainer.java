@@ -1,6 +1,7 @@
 package com.jimu.monitor.collect.monitorkeeper.etcd;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.base.Optional;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
@@ -12,10 +13,12 @@ import com.jimu.monitor.utils.HttpClientHelper;
 import com.jimu.monitor.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -37,12 +40,24 @@ public class EtcdResultContainer {
         return allGroupsInEtcd;
     }
 
-
     // @PostConstruct
     public void init() throws Exception {
         allGroupsInEtcd = crawlGroupListInETCD();
 
         // 注册一个接口, 监听etcd接口变化信息
+    }
+
+    @Scheduled(cron = "1 */5 * * * ?") // 每5分钟的第1s执行一次
+    public void refreshJob() {
+        try {
+            List allGroups = crawlGroupListInETCD();
+            allGroupsInEtcd = new CopyOnWriteArrayList<>(allGroups);
+            log.info("got {} jobs in etcd", allGroups.size());
+            JMonitor.recordSize("job_in_etcd", allGroups.size());
+        } catch (Throwable t) {
+            log.info("error in refresh job.", t);
+            JMonitor.recordOne("refresh etcd content error");
+        }
     }
 
     /**
@@ -85,10 +100,12 @@ public class EtcdResultContainer {
 
         List<Group> groupList = Lists.newArrayList();
 
+        // 合并相同的app
         SetMultimap<String, String> setMultimap = HashMultimap.create();
-        etcdList.stream().filter(etcd -> etcd.generateUrl().isPresent())
-                .forEach(etcd -> setMultimap.put(etcd.uniqKey(), etcd.generateUrl().get()));
+        etcdList.stream().filter(etcd -> generateUrl(etcd).isPresent())
+                .forEach(etcd -> setMultimap.put(SetKeyGenerator.gen(etcd.env, etcd.app), generateUrl(etcd).get()));
 
+        // 取出来
         setMultimap.asMap().forEach((name, urlSet) -> {
             List<Domain> domainList = Lists.newArrayList();
             Iterator<String> it = urlSet.iterator();
@@ -99,6 +116,27 @@ public class EtcdResultContainer {
             }
             groupList.add(new Group(name, domainList));
         });
+
         return groupList;
+    }
+
+    // 生成这个机器对应的监控数据url
+    private Optional<String> generateUrl(EtcdResult etcdResult) {
+        Map<String, String> portMap = JsonUtils.readValue(etcdResult.ports, Map.class);
+        if (portMap == null || portMap.size() < 0) {
+            log.error("ports 转换异常. ports:{}, etcdResult:{}", etcdResult.ports, this);
+            JMonitor.recordOne("etcd_ports_change_error");
+            return Optional.absent();
+        }
+
+        try {
+            String key = portMap.keySet().toArray()[0].toString();
+            String portValue = key.split("/")[0];
+            int port = Integer.parseInt(portValue);
+            return Optional.of("http://" + etcdResult.ip + ":" + port + "/_metric/monitor.do");
+        } catch (Exception e) {
+            // 有时返回的数据里, 没有port, 是正常的
+            return Optional.absent();
+        }
     }
 }

@@ -1,0 +1,49 @@
+package com.jimu.monitor.collect.monitorkeeper.etcd;
+
+import com.ning.http.client.AsyncHandler;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.HttpResponseBodyPart;
+import com.ning.http.client.HttpResponseHeaders;
+import com.ning.http.client.HttpResponseStatus;
+
+/**
+ * Created by zhenbao.zhou on 16/7/1.
+ */
+public class Test {
+
+    public static void main(String[] args) {
+        AsyncHttpClient c = new AsyncHttpClient();
+
+        // We are just interested to retrieve the status code.
+        c.prepareGet("https://daikon.jimubox.com/api/events").execute(new AsyncHandler() {
+
+            public STATE onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception {
+                System.out.println("body part:" + bodyPart);
+                return STATE.CONTINUE;
+            }
+
+            @Override
+            public STATE onStatusReceived(HttpResponseStatus responseStatus) throws Exception {
+                System.out.println("onStatusReceived" + responseStatus);
+                return null;
+            }
+
+            @Override
+            public STATE onHeadersReceived(HttpResponseHeaders headers) throws Exception {
+                System.out.println("onHeadersReceived" + headers);
+                return null;
+            }
+
+            @Override
+            public Object onCompleted() throws Exception {
+                System.out.println("onCompleted");
+                return null;
+            }
+
+            @Override
+            public void onThrowable(Throwable t) {
+                System.out.println("onThrowable");
+            }
+        });
+    }
+}

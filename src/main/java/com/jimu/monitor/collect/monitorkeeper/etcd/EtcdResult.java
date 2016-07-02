@@ -13,6 +13,8 @@ import java.util.Map;
 /**
  * 保存etcd返回回来的信息. 具体的内容
  * @see com.jimu.monitor.collect.monitorkeeper.etcd.EtcdResultContainer
+ *
+ * refer to http://git.jimubox.com/snippets/23
  * Created by zhenbao.zhou on 16/7/1.
  */
 @Getter

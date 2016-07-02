@@ -5,7 +5,6 @@ import com.google.common.collect.Sets;
 import com.jimu.common.jmonitor.JMonitor;
 import com.jimu.monitor.collect.db.Filter;
 import com.jimu.monitor.collect.db.FilterMapper;
-import com.jimu.monitor.collect.monitorkeeper.MonitorGroupInEtcdKeeper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,18 +33,21 @@ public class WhiteListService {
     @PostConstruct
     public void init() throws Exception {
         reloadDBFilter();
-        // 注册一个接口, 监听etcd接口变化信息
+        // DB的配置更新时, 会人为的触发一个动作
     }
 
+
     /**
-     * 更新一行配置. 目前只支持status的更新
-     * 
-     * @param filter
+     * 更新某一条记录的状态
+     * @param id
+     * @param status
      * @return
      */
-    public int updateFilter(Filter filter) {
+    public int updateFilterStatus(int id, int status) {
+        Filter filter = Filter.builder().id(id).status(status).build();
         return filterMapper.updateFilter(filter);
     }
+
 
     /**
      * 插入一个白名单, 默认status 为0(有效)
@@ -85,6 +87,7 @@ public class WhiteListService {
         log.info("reload db filter begin");
         Stopwatch stopwatch = Stopwatch.createStarted();
         HashSet<String> set = Sets.newHashSet();
+        // TODO 如果filter太多了之后, 这里代码要分页获取.
         List<Filter> filterList = filterMapper.queryAvailableFilterList();
         log.info("reload db filter 从数据库去取filter结束.  filterListSize:{}", filterList.size());
         JMonitor.recordOne("load filter from db.", stopwatch.elapsed(TimeUnit.MILLISECONDS));

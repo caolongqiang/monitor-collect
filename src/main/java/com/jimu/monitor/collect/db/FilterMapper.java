@@ -11,13 +11,13 @@ import java.util.List;
 public interface FilterMapper {
 
     /**
-     * 查出所有有效的filter
+     * 查出所有<b>有效的</b>filter
      * @return
      */
     List<Filter> queryAvailableFilterList();
 
     /**
-     * 查出所有filter
+     * 查出所有filter.
      * @return
      */
     List<Filter> findFilterList(@Param("limit") int limit, @Param("offset")int offset);

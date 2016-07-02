@@ -79,13 +79,4 @@ public class HttpCollector implements Collector {
 
     }
 
-    public static void main(String[] args) throws Exception {
-        Domain domain = new Domain();
-        domain.setHost("test");
-        domain.setUrl("http://l-qtaorderstorep18.h.cn8.qunar.com:8080/monitor/qmonitor.jsp");
-        HttpCollector collector = new HttpCollector(domain);
-        CompletableFuture<Packet> listenableFuture = collector.collect();
-        Packet packet = listenableFuture.get();
-        Thread.sleep(50000);
-    }
 }

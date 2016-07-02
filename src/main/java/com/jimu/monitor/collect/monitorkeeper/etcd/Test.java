@@ -7,6 +7,8 @@ import com.ning.http.client.HttpResponseHeaders;
 import com.ning.http.client.HttpResponseStatus;
 
 /**
+ * 这个代码本来是想来测试 events接口的. 但是取不到数据. 尴尬
+ * refer to http://git.jimubox.com/snippets/24
  * Created by zhenbao.zhou on 16/7/1.
  */
 public class Test {

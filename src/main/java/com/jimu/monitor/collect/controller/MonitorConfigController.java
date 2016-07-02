@@ -5,8 +5,8 @@ import com.jimu.common.jmonitor.JMonitor;
 import com.jimu.monitor.JsonData;
 import com.jimu.monitor.collect.bean.Group;
 import com.jimu.monitor.collect.db.Filter;
-import com.jimu.monitor.collect.monitorkeeper.MonitorConfigInFileService;
-import com.jimu.monitor.collect.monitorkeeper.MonitorGroupInEtcdKeeper;
+import com.jimu.monitor.collect.monitorkeeper.FileGroupConfigService;
+import com.jimu.monitor.collect.monitorkeeper.EtcdGroupConfigKeeper;
 import com.jimu.monitor.collect.monitorkeeper.etcd.EtcdResultContainer;
 import com.jimu.monitor.collect.monitorkeeper.etcd.WhiteListService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +29,10 @@ import java.util.Map;
 public class MonitorConfigController {
 
     @Resource
-    MonitorConfigInFileService monitorConfigInFileService;
+    FileGroupConfigService fileGroupConfigService;
 
     @Resource
-    MonitorGroupInEtcdKeeper monitorGroupInEtcdKeeper;
+    EtcdGroupConfigKeeper etcdGroupConfigKeeper;
 
     @Resource
     EtcdResultContainer etcdResultContainer;
@@ -42,13 +42,13 @@ public class MonitorConfigController {
 
     @RequestMapping("reloadFileConfig.j")
     public @ResponseBody String reloadFileConfig() throws Exception {
-        monitorConfigInFileService.reload();
+        fileGroupConfigService.reload();
         return "reload success";
     }
 
     @RequestMapping("showFileGroupList.j")
     public @ResponseBody List<Group> showFileGroupList() throws Exception {
-        return monitorConfigInFileService.getGroupList();
+        return fileGroupConfigService.getGroupList();
     }
 
     @RequestMapping("showEtcdGroupList.j")
@@ -61,13 +61,13 @@ public class MonitorConfigController {
         etcdResultContainer.refreshJob();
 
         // 更新整个etcd的结果
-        monitorGroupInEtcdKeeper.refresh();
+        etcdGroupConfigKeeper.refresh();
         return "reload reloadEtcdConfig success";
     }
 
     @RequestMapping("showEtcdWorkingConfig.j")
     public @ResponseBody List<Group> showEtcdWorkingConfig() throws Exception {
-        return monitorGroupInEtcdKeeper.getGroupList();
+        return etcdGroupConfigKeeper.getGroupList();
     }
 
     @RequestMapping("reloadWhiteList.j")
@@ -76,7 +76,7 @@ public class MonitorConfigController {
         whiteListService.reloadDBFilter();
 
         // 更新整个etcd的结果
-        monitorGroupInEtcdKeeper.refresh();
+        etcdGroupConfigKeeper.refresh();
 
         return JsonData.success("reload whitelist success");
     }
@@ -106,11 +106,10 @@ public class MonitorConfigController {
 
     @RequestMapping("updateFilter.j")
     public @ResponseBody JsonData updateFilter(@RequestParam int id, @RequestParam int status) {
-        Filter filter = Filter.builder().id(id).status(status).build();
         JMonitor.recordOne("db update filter");
         log.info("update filter. id:{}, status:{}", id, status);
         try {
-            whiteListService.updateFilter(filter);
+            whiteListService.updateFilterStatus(id, status);
             return JsonData.success("更新成功");
         } catch (Exception e) {
             log.warn("error in update id:{}, status:{}", id, status, e);

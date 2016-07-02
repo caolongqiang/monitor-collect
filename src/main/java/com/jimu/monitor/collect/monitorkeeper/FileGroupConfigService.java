@@ -43,7 +43,7 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
  */
 @Slf4j
 @Service
-public class MonitorConfigInFileService implements MonitorGroupKeeper {
+public class FileGroupConfigService implements MonitorGroupKeeper {
 
     private static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(1);
 

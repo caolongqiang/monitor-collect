@@ -43,7 +43,7 @@ import static com.jimu.monitor.Configs.config;
  */
 @Slf4j
 @Service
-public class MonitorGroupInEtcdKeeper implements MonitorGroupKeeper {
+public class EtcdGroupConfigKeeper implements MonitorGroupKeeper {
 
     @Resource
     EtcdResultContainer etcdResultContainer;

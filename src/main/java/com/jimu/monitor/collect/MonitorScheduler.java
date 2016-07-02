@@ -13,7 +13,6 @@ import javax.annotation.Resource;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * 调度服务的入口, 读取任务 Created by zhenbao.zhou on 2016/5/25
@@ -23,12 +22,10 @@ import java.util.concurrent.ScheduledExecutorService;
 @Slf4j
 public class MonitorScheduler {
 
-    private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(2);
+    @Resource(name = "etcdGroupConfigKeeper")
+    private MonitorGroupKeeper etcdGroupKeeper;
 
-    @Resource(name = "monitorGroupInEtcdKeeper")
-    private MonitorGroupKeeper groupKeeper;
-
-    @Resource(name = "monitorConfigInFileService")
+    @Resource(name = "fileGroupConfigService")
     private MonitorGroupKeeper fileGroupKeeper;
 
     // 无界队列,不丢弃采集任务
@@ -39,7 +36,7 @@ public class MonitorScheduler {
         log.info("start scheduleJob");
         try {
             Iterable<Group> groupIterable = Iterables.unmodifiableIterable(
-                    Iterables.concat(groupKeeper.getGroupList(), fileGroupKeeper.getGroupList()));
+                    Iterables.concat(etcdGroupKeeper.getGroupList(), fileGroupKeeper.getGroupList()));
 
             for (Group group : groupIterable) {
                 threadPoolExecutor.execute(TimerTaskFactory.of(group));// 马上执行收集各个group

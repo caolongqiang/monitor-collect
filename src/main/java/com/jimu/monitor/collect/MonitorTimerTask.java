@@ -30,8 +30,8 @@ public final class MonitorTimerTask implements Runnable {
     // 保证任务一开始就能运行
     private DateTime lastTime = DateTime.now().minusMinutes(1);
 
-    // private Storer storer = new LogStorer();
-    private Storer storer = ApplicationContextHelper.popBean(CarbonStorer.class);
+    private Storer storer = new LogStorer();
+    // private Storer storer = ApplicationContextHelper.popBean(CarbonStorer.class);
 
     MonitorTimerTask(Group group) {
         this.group = group;
@@ -53,10 +53,6 @@ public final class MonitorTimerTask implements Runnable {
             Collector collector = CollectorFactory.of(domain);
             return collector.collect();
         }).toArray(CompletableFuture[]::new);
-        // toArray(value -> (CompletableFuture<Packet>[]) Array.newInstance(CompletableFuture.class, value));
-        // toArray(CompletableFuture[]::new) 上面的这行代码, 也可以直接写成下面这样. 收到的报警是一样的
-
-
         // 合并结果
         combineAndStore(group, futureArray);
 

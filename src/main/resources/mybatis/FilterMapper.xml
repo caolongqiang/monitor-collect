@@ -13,12 +13,19 @@
         status = 0
     </select>
 
-    <select id="finaAllFilter"
+    <select id="findFilterList"
             resultType="com.jimu.monitor.collect.db.Filter">
         SELECT
         id, app, env, status
         FROM
-        filter order by id desc;
+        filter order by id desc limit #{limit} offset #{offset};
+    </select>
+
+    <select id="countFilterList" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        filter;
     </select>
 
     <update id="updateFilter"

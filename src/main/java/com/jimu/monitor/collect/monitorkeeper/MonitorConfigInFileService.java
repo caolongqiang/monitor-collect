@@ -11,6 +11,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -38,7 +39,7 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 /**
  * Created by yue.liu on 16/5/22.
- * 现在改成主要从远程接口读取所有需要拉的数据了, 不再从文件里读取配置
+ * 现在改成主要从远程接口读取所有需要拉的数据了,  只有极少的配置(主要是kvm的配置),需要从文件里读取配置
  */
 @Slf4j
 @Service
@@ -71,7 +72,7 @@ public class MonitorConfigInFileService implements MonitorGroupKeeper {
      *
      * @throws Exception
      */
-    // @PostConstruct
+    @PostConstruct
     public void init() throws Exception {
 
         watchService = FileSystems.getDefault().newWatchService();

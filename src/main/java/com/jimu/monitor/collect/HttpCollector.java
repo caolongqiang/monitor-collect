@@ -87,6 +87,5 @@ public class HttpCollector implements Collector {
         CompletableFuture<Packet> listenableFuture = collector.collect();
         Packet packet = listenableFuture.get();
         Thread.sleep(50000);
-
     }
 }

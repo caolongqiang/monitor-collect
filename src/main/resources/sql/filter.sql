@@ -6,7 +6,7 @@ CREATE TABLE `filter` (
   `last_update` timestamp(6) default now() NOT NULL,
   `operator` varchar(128),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_department_group_status`(`app`,`env`, `status`)
+  UNIQUE KEY `unique_department_group_status`(`app`,`env`)
   )  ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
   CREATE INDEX status_idx ON filter (status);

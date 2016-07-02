@@ -13,9 +13,11 @@ import com.jimu.monitor.utils.HttpClientHelper;
 import com.jimu.monitor.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -36,18 +38,19 @@ public class EtcdResultContainer {
     // 在etcd里的所有docker实例信息
     List<Group> allGroupsInEtcd = new CopyOnWriteArrayList<>();
 
-    private List<Group> ETCDResultList() {
+    public List<Group> ETCDResultList() {
         return allGroupsInEtcd;
     }
 
-    // @PostConstruct
+    @PostConstruct
     public void init() throws Exception {
         allGroupsInEtcd = crawlGroupListInETCD();
 
         // 注册一个接口, 监听etcd接口变化信息
+        // TODO 通过这个接口, 我现在取不到信息, 好诡异.. 到时候再看一下
     }
 
-    @Scheduled(cron = "1 */5 * * * ?") // 每5分钟的第1s执行一次
+    @Scheduled(cron = "1 */2 * * * ?") // 每2分钟的第1s执行一次
     public void refreshJob() {
         try {
             List allGroups = crawlGroupListInETCD();
@@ -122,6 +125,10 @@ public class EtcdResultContainer {
 
     // 生成这个机器对应的监控数据url
     private Optional<String> generateUrl(EtcdResult etcdResult) {
+        if (StringUtils.isBlank(etcdResult.getPorts())) {
+            return Optional.absent();
+        }
+
         Map<String, String> portMap = JsonUtils.readValue(etcdResult.ports, Map.class);
         if (portMap == null || portMap.size() < 0) {
             log.error("ports 转换异常. ports:{}, etcdResult:{}", etcdResult.ports, this);

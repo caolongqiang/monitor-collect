@@ -20,7 +20,9 @@ public interface FilterMapper {
      * 查出所有filter
      * @return
      */
-    List<Filter> finaAllFilter();
+    List<Filter> findFilterList(@Param("limit") int limit, @Param("offset")int offset);
+
+    int countFilterList();
 
     int updateFilter(Filter filter);
 

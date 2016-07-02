@@ -10,10 +10,26 @@
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
 
+
     <!-- webapp里的*servlet 一定只能扫描controller的代码, 否则会造成一些bean会初始化两次 -->
     <context:component-scan base-package="com.jimu.monitor.collect" use-default-filters="false">
-        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
+
+    <bean
+            class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>  <!-- 这个类里面你可以注册拦截器什么的 -->
+    <bean id="jacksonMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+    <bean
+            class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <ref bean="jacksonMessageConverter"/>    <!-- 注册JSON Converter -->
+            </list>
+        </property>
+    </bean>
+
+    <mvc:annotation-driven/>
 
 
     <bean class="org.springframework.web.servlet.view.BeanNameViewResolver"/>

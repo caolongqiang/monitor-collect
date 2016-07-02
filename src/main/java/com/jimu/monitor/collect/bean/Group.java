@@ -44,5 +44,6 @@ public class Group implements Serializable {
         this.name = name;
         this.domainList = domainList;
         this.department = DEFAULT_DEPARTMENT;
+        type = Type.HTTP;
     }
 }

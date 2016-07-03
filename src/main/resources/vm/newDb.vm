@@ -157,11 +157,8 @@
 },
 {
 "current": {
-"tags": [],
-"text": "All",
-"value": [
-"$__all"
-]
+"text": "a",
+"value": "a"
 },
 "datasource": null,
 "hide": 0,

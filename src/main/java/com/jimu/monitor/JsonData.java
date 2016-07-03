@@ -11,9 +11,6 @@ import lombok.ToString;
 
 /**
  * 符合最新前后端规范（V1）json返回值格式的辅助对象
- * 该规范详情请参考：
- * <a href="http://wiki.corp.qunar.com/pages/viewpage.action?pageId=62623211">
- *     度假tts前后端接口规范
  * </a>
  *
  * @since 1.0.0

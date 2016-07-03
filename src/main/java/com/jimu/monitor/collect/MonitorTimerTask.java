@@ -30,8 +30,8 @@ public final class MonitorTimerTask implements Runnable {
     // 保证任务一开始就能运行
     private DateTime lastTime = DateTime.now().minusMinutes(1);
 
-    private Storer storer = new LogStorer();
-    // private Storer storer = ApplicationContextHelper.popBean(CarbonStorer.class);
+    // private Storer storer = new LogStorer();
+    private Storer storer = ApplicationContextHelper.popBean(CarbonStorer.class);
 
     MonitorTimerTask(Group group) {
         this.group = group;

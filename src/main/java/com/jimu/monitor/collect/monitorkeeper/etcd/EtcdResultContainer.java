@@ -166,7 +166,7 @@ public class EtcdResultContainer {
             String key = portMap.keySet().toArray()[0].toString();
             String portValue = key.split("/")[0];
             int port = Integer.parseInt(portValue);
-            return Optional.of("http://" + etcdResult.ip + ":" + port + "/_metric/monitor.do");
+            return Optional.of("http://" + etcdResult.ip + ":" + port + "/_metrics/monitor.do");
         } catch (Exception e) {
             // 有时返回的数据里, 没有port, 是正常的
             JMonitor.recordOne("etcd_ports_change_error");

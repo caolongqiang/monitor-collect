@@ -28,7 +28,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import static com.jimu.monitor.Configs.config;
 
 /**
- * 维护etcd里的数据结果 Created by zhenbao.zhou on 16/7/1.
+ * 维护etcd里的数据结果
+ *
+ * Created by zhenbao.zhou on 16/7/1.
  */
 @Service
 @Slf4j

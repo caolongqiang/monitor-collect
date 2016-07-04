@@ -38,7 +38,9 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 /**
- * Created by yue.liu on 16/5/22. 现在改成主要从远程接口读取所有需要拉的数据了, 只有极少的配置(主要是kvm的配置),需要从文件里读取配置
+ * Created by yue.liu on 16/5/22.
+ *
+ * 现在改成主要从远程接口读取所有需要拉的数据了, 只有极少的配置(主要是kvm的配置),需要从文件里读取配置
  */
 @Slf4j
 @Service

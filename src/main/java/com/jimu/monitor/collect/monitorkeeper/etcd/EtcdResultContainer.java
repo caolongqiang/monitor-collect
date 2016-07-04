@@ -22,8 +22,8 @@ import javax.annotation.PostConstruct;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.jimu.monitor.Configs.config;
 
@@ -37,7 +37,7 @@ public class EtcdResultContainer {
     private final static String HOST_NAME_PREFIX = "host";
 
     // 在etcd里的所有docker实例信息
-    List<Group> allGroupsInEtcd = new CopyOnWriteArrayList<>();
+    List<Group> allGroupsInEtcd = Lists.newArrayList();
 
     public List<Group> ETCDResultList() {
         return allGroupsInEtcd;
@@ -55,7 +55,9 @@ public class EtcdResultContainer {
     public void refreshJob() {
         try {
             List allGroups = crawlGroupListInETCD();
-            allGroupsInEtcd = new CopyOnWriteArrayList<>(allGroups);
+            AtomicReference<List> atomicReference = new AtomicReference<>(allGroupsInEtcd);
+            atomicReference.compareAndSet(allGroupsInEtcd, allGroups);
+            allGroupsInEtcd = atomicReference.get();
             log.info("got {} jobs in etcd", allGroups.size());
             JMonitor.recordSize("job_in_etcd", allGroups.size());
         } catch (Throwable t) {
@@ -67,7 +69,9 @@ public class EtcdResultContainer {
     /**
      *
      * 从api里获取内容 ETCD 的API内容是
-     * [
+     * 
+     * <pre>
+     *      [
      {
      app: "bbae-www",
      env: "production",
@@ -92,6 +96,8 @@ public class EtcdResultContainer {
      }
      ]
      *
+     * </pre>
+     * 
      * @return
      */
     private List<Group> crawlGroupListInETCD() {
@@ -131,8 +137,8 @@ public class EtcdResultContainer {
         // 合并相同的app
         SetMultimap<String, String> setMultimap = HashMultimap.create();
 
-        etcdList.stream().filter(etcd -> generateMonitorUrl(etcd).isPresent())
-                .forEach(etcd -> setMultimap.put(SetKeyGenerator.gen(etcd.env, etcd.app), generateMonitorUrl(etcd).get()));
+        etcdList.stream().filter(etcd -> generateMonitorUrl(etcd).isPresent()).forEach(
+                etcd -> setMultimap.put(SetKeyGenerator.gen(etcd.env, etcd.app), generateMonitorUrl(etcd).get()));
 
         // 取出来
         setMultimap.asMap().forEach((name, urlSet) -> {
@@ -149,7 +155,7 @@ public class EtcdResultContainer {
         return groupList;
     }
 
-    // 生成这个机器对应的监控数据url. port的值为  ports: "{"8080/tcp":"172.20.0.16:1112"}"
+    // 生成这个机器对应的监控数据url. port的值为 ports: "{"8080/tcp":"172.20.0.16:1112"}"
     // 我会取出第一个key里的8080, 和etcd里的ip合起来, 作为monitorUrl
     private Optional<String> generateMonitorUrl(EtcdResult etcdResult) {
         if (StringUtils.isBlank(etcdResult.getPorts())) {

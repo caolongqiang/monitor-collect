@@ -2,8 +2,8 @@ package com.jimu.monitor.collect.monitorkeeper;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.jimu.monitor.collect.bean.Group;
-import com.jimu.monitor.collect.monitorkeeper.MonitorGroupKeeper;
 import com.jimu.monitor.utils.JsonUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,13 +24,13 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static com.google.common.io.Resources.getResource;
 import static com.jimu.monitor.Configs.config;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
@@ -38,8 +38,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 /**
- * Created by yue.liu on 16/5/22.
- * 现在改成主要从远程接口读取所有需要拉的数据了,  只有极少的配置(主要是kvm的配置),需要从文件里读取配置
+ * Created by yue.liu on 16/5/22. 现在改成主要从远程接口读取所有需要拉的数据了, 只有极少的配置(主要是kvm的配置),需要从文件里读取配置
  */
 @Slf4j
 @Service
@@ -49,18 +48,17 @@ public class FileGroupConfigService implements MonitorGroupKeeper {
 
     private final static String SUFFIX = ".json";
 
-    // groupList需要是一个cow list哦. 别用错了
     @Getter
-    private List<Group> groupList = new CopyOnWriteArrayList<>();
+    private List<Group> groupList = Lists.newArrayList();
 
     // key: groupKey value: group
-    private ConcurrentHashMap<String, Group> keyGroupMap = new ConcurrentHashMap<>();
+    private Map<String, Group> keyGroupMap = Maps.newHashMap();
 
     // key: filePath value: groupKey
-    private ConcurrentHashMap<String, String> fileKeyMap = new ConcurrentHashMap<>();
+    private Map<String, String> fileKeyMap = Maps.newHashMap();
 
     // key: groupKey value: filePath
-    private ConcurrentHashMap<String, String> keyFileMap = new ConcurrentHashMap<>();
+    private Map<String, String> keyFileMap = Maps.newHashMap();
 
     private WatchService watchService;
 
@@ -124,9 +122,17 @@ public class FileGroupConfigService implements MonitorGroupKeeper {
     }
 
     public void reload() throws IOException {
-        keyGroupMap = new ConcurrentHashMap<>();
-        fileKeyMap = new ConcurrentHashMap<>();
-        keyFileMap = new ConcurrentHashMap<>();
+        AtomicReference<Map> ar = new AtomicReference(keyGroupMap);
+        ar.compareAndSet(keyGroupMap, Maps.newHashMap());
+        keyGroupMap = ar.get();
+
+        ar = new AtomicReference<>(fileKeyMap);
+        ar.compareAndSet(fileKeyMap, Maps.newHashMap());
+        fileKeyMap = ar.get();
+
+        ar = new AtomicReference<>(keyFileMap);
+        ar.compareAndSet(keyFileMap, Maps.newHashMap());
+        keyFileMap = ar.get();
 
         calcLatestGroups();
     }
@@ -182,7 +188,7 @@ public class FileGroupConfigService implements MonitorGroupKeeper {
 
         switch (operation) {
         case ADD: // 新增文件
-            if (keyFileMap.contains(groupKey)) {
+            if (keyFileMap.keySet().contains(groupKey)) {
                 throw new RuntimeException("group key has existed, cannot create!");
             }
             log.info("add file, file:{}, groupKey:{}", filePath, groupKey);
@@ -194,7 +200,7 @@ public class FileGroupConfigService implements MonitorGroupKeeper {
             String originGroupKey = fileKeyMap.get(filePath);
             if (originGroupKey != null && !originGroupKey.equals(groupKey)) {
                 // groupKey变了， 添加新的(同时新的key不能重复), 并删除原有的
-                if (keyFileMap.contains(groupKey)) {
+                if (keyFileMap.keySet().contains(groupKey)) {
                     throw new RuntimeException("group key has existed, cannot modify!");
                 }
                 removeByFile(filePath);
@@ -238,10 +244,14 @@ public class FileGroupConfigService implements MonitorGroupKeeper {
      * 更新最新的group list
      */
     private void updateGroupList() {
+        AtomicReference<List> ar = new AtomicReference<>(groupList);
         if (MapUtils.isEmpty(keyGroupMap)) {
-            groupList = Lists.newCopyOnWriteArrayList();
+            ar.compareAndSet(groupList, Lists.newArrayList());
+        } else {
+            ar.compareAndSet(groupList, new ArrayList<>(keyGroupMap.values()));
         }
-        groupList = new CopyOnWriteArrayList<>(keyGroupMap.values());
+
+        groupList = ar.get();
     }
 
     enum Operation {

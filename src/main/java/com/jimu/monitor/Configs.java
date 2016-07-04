@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.annotation.ThreadSafe;
 
+import java.io.Reader;
 import java.util.Properties;
 
 import static com.google.common.io.Resources.asCharSource;
@@ -21,8 +22,8 @@ public enum Configs {
     private static final Properties properties = new Properties();
 
     static {
-        try {
-            properties.load(asCharSource(getResource("config.properties"), Charsets.UTF_8).openStream());
+        try (Reader reader = asCharSource(getResource("config.properties"), Charsets.UTF_8).openStream()) {
+            properties.load(reader);
         } catch (Exception ex) {
             log.error("配置文件初始化出现问题", ex);
             throw new Error("配置文件初始化异常"); // 中止程序启动

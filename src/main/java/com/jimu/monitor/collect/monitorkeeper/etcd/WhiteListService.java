@@ -14,8 +14,8 @@ import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 获取db里的app白名单 Created by zhenbao.zhou on 16/7/1.
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class WhiteListService {
 
     @Getter
-    Set whiteList = new CopyOnWriteArraySet<>();
+    Set whiteList = Sets.newHashSet();
 
     @Resource
     private FilterMapper filterMapper;
@@ -36,9 +36,9 @@ public class WhiteListService {
         // DB的配置更新时, 会人为的触发一个动作
     }
 
-
     /**
      * 更新某一条记录的状态
+     * 
      * @param id
      * @param status
      * @return
@@ -47,7 +47,6 @@ public class WhiteListService {
         Filter filter = Filter.builder().id(id).status(status).build();
         return filterMapper.updateFilter(filter);
     }
-
 
     /**
      * 插入一个白名单, 默认status 为0(有效)
@@ -96,7 +95,9 @@ public class WhiteListService {
         });
 
         if (!set.isEmpty()) {
-            whiteList = new CopyOnWriteArraySet<>(set);
+            AtomicReference<Set> atomicReference = new AtomicReference<>(whiteList);
+            atomicReference.compareAndSet(whiteList, set);
+            whiteList = atomicReference.get();
         } else {
             log.warn("db读取出来的filter 列表为空");
             JMonitor.recordOne("reload dbFilter error");

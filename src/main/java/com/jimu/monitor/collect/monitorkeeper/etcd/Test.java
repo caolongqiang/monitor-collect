@@ -6,6 +6,8 @@ import com.ning.http.client.HttpResponseBodyPart;
 import com.ning.http.client.HttpResponseHeaders;
 import com.ning.http.client.HttpResponseStatus;
 
+import java.util.concurrent.Future;
+
 /**
  * 这个代码本来是想来测试 events接口的. 但是取不到数据. 尴尬
  * refer to http://git.jimubox.com/snippets/24
@@ -17,7 +19,7 @@ public class Test {
         AsyncHttpClient c = new AsyncHttpClient();
 
         // We are just interested to retrieve the status code.
-        c.prepareGet("https://daikon.jimubox.com/api/events").execute(new AsyncHandler() {
+        c.prepareGet("https://daikon.jimubox.com/api/events").setRequestTimeout(-1).execute(new AsyncHandler() {
 
             public STATE onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception {
                 System.out.println("body part:" + bodyPart);
@@ -27,13 +29,13 @@ public class Test {
             @Override
             public STATE onStatusReceived(HttpResponseStatus responseStatus) throws Exception {
                 System.out.println("onStatusReceived" + responseStatus);
-                return null;
+                return STATE.CONTINUE;
             }
 
             @Override
             public STATE onHeadersReceived(HttpResponseHeaders headers) throws Exception {
                 System.out.println("onHeadersReceived" + headers);
-                return null;
+                return STATE.CONTINUE;
             }
 
             @Override

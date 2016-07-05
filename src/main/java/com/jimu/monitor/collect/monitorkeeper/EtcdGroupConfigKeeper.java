@@ -34,7 +34,7 @@ public class EtcdGroupConfigKeeper implements MonitorGroupKeeper {
 
     // groupList需要是一个cow list哦. 别用错了.
     // 只有这个group 才进行抓取任务
-    private List<Group> groupList = Lists.newArrayList();
+    private volatile List<Group> groupList = Lists.newArrayList();
 
     public List<Group> getGroupList() {
         if (groupList.size() == 0) {
@@ -62,10 +62,8 @@ public class EtcdGroupConfigKeeper implements MonitorGroupKeeper {
 
         // TODO 其实这里最好做一个比较, 改变的比例大于多少时, 也放弃这次更新.
         if (CollectionUtils.isNotEmpty(filtered)) {
+            groupList = filtered;
             log.info("change groupList. groupListSize:{}", groupList.size());
-            AtomicReference<List> ar = new AtomicReference(groupList);
-            ar.compareAndSet(groupList, filtered);
-            groupList = ar.get();
         } else {
             JMonitor.recordOne("filtered group list empty");
         }

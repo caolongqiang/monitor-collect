@@ -120,7 +120,7 @@ public class HttpCombiner implements Combiner {
 
         static Set<String> needAvgSuffixes = ImmutableSet.of("_Time", "_CACHE_Value", "_RADIO_L_Value", "_RADIO_Value");
 
-        class SuffixPredicate implements Predicate<String> {
+        static class SuffixPredicate implements Predicate<String> {
             @Override
             public boolean test(String input) {
                 for (String suffix : needAvgSuffixes) {

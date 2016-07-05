@@ -54,7 +54,6 @@ public class EtcdResultContainer {
     public void init() throws Exception {
         refreshJob();
 
-        // 监听etcd event api的接口
         etcdEventWatcher.watch();
     }
 

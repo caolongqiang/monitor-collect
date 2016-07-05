@@ -53,6 +53,8 @@ public class EtcdEventWatcher {
     @Autowired
     EtcdResultContainer etcdResultContainer;
 
+    private final static AsyncHttpClient client = new AsyncHttpClient(asyncConfig);
+
     // 单例
     private static WatchWorker watchWorker = new EtcdEventWatcher().new WatchWorker();
 
@@ -73,7 +75,7 @@ public class EtcdEventWatcher {
                 workerExecutor.schedule(watchWorker, WORKER_DELAY_TIME_IN_SECOND, TimeUnit.SECONDS);
                 return;
             }
-            AsyncHttpClient client = new AsyncHttpClient(asyncConfig);
+
             running = true;
 
             client.prepareGet(config.getEtcdEventApi()).execute(new AsyncHandler() {
@@ -114,8 +116,7 @@ public class EtcdEventWatcher {
         }
 
         /**
-         * content的信息请参考 http://git.jimubox.com/snippets/24
-         * 目前看到的信息是
+         * content的信息请参考 http://git.jimubox.com/snippets/24 目前看到的信息是
          * 
          * <pre>
          *     {

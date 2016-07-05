@@ -8,12 +8,20 @@
 </head>
 <head>
     <title>白名单配置</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link href="/static/css/bootstrap.css" rel="stylesheet" media="screen"/>
-    <link href="/static/css/bootstrap-table.css" rel="stylesheet" media="screen"/>
-    <script src="/static/js/jquery-2.2.2.min.js"></script>
-    <script src="/static/js/bootstrap-table.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="//cdn.bootcss.com/jquery/2.2.2/jquery.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.js"></script>
+
+    <!-- Latest compiled and minified Locales -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/locale/bootstrap-table-zh-CN.min.js"></script>
+
+    <link href="//cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.css" rel="stylesheet">
+
+
+
 </head>
 
 <body>
@@ -237,7 +245,7 @@
 
     window.operateEvents = {
         'click .remove': function (e, value, row, index) {
-            $.post("/monitor/updateFilter.j",
+            $.post("updateFilter.j",
                     {
                         id: row.id,
                         status: 1
@@ -248,7 +256,7 @@
                     });
         },
         'click .reworking': function (e, value, row, index) {
-            $.post("/monitor/updateFilter.j",
+            $.post("updateFilter.j",
                     {
                         id: row.id,
                         status: 0

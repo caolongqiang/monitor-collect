@@ -51,11 +51,11 @@
         <dt>
             <button type="button" class="btn btn-danger" id="reloadWhiteList">重新load白名单配置</button>
         </dt>
-        <dt><a href="/monitor/showFileGroupList.j" target="_blank">展示现在的文件配置</a></dt>
-        <dt><a href="/monitor/reloadFileConfig.j" target="_blank">重新load文件配置</a></dt>
-        <dt><a href="/monitor/showEtcdGroupList.j" target="_blank">展示所有的ETCD里的配置</a></dt>
-        <dt><a href="/monitor/reloadEtcdConfig.j" target="_blank">重新读取所有etcd里的配置</a></dt>
-        <dt><a href="/monitor/showEtcdWorkingConfig.j" target="_blank">展示所有的ETCD里的正在抓取配置</a></dt>
+        <dt><a href="showFileGroupList.j" target="_blank">展示现在的文件配置</a></dt>
+        <dt><a href="reloadFileConfig.j" target="_blank">重新load文件配置</a></dt>
+        <dt><a href="showEtcdGroupList.j" target="_blank">展示所有的ETCD里的配置</a></dt>
+        <dt><a href="reloadEtcdConfig.j" target="_blank">重新读取所有etcd里的配置</a></dt>
+        <dt><a href="showEtcdWorkingConfig.j" target="_blank">展示所有的ETCD里的正在抓取配置</a></dt>
     </dl>
 
 </div>
@@ -65,7 +65,7 @@
     $(document).ready(function () {
         $('#addFilter').click(function () {
 
-            $.post("/monitor/insertFilter.j",
+            $.post("insertFilter.j",
                     {
                         app: $('#app').val(),
                         env: $('#env').val()
@@ -79,7 +79,7 @@
 
         $('#reloadWhiteList').click(function () {
 
-            $.get("/monitor/reloadWhiteList.j",
+            $.get("reloadWhiteList.j",
                     function (data, status) {
                         alert(data.msg);
                     });
@@ -129,7 +129,7 @@
                 //初始化Table
                 oTableInit.Init = function () {
                     $('#all_whitelist').bootstrapTable({
-                        url: '/monitor/queryWhiteList.j',         //请求后台的URL（*）
+                        url: 'queryWhiteList.j',         //请求后台的URL（*）
                         method: 'get',                      //请求方式（*）
                         //toolbar: '#toolbar',                //工具按钮用哪个容器
                         striped: true,                      //是否显示行间隔色

@@ -120,10 +120,6 @@ public class HttpCombiner implements Combiner {
 
         static Set<String> needAvgSuffixes = ImmutableSet.of("_Time", "_CACHE_Value", "_RADIO_L_Value", "_RADIO_Value");
 
-        // TODO 这段代码好像没有必要了
-        static Set<String> needAvgMetrics = ImmutableSet.of("JVM_MarkSweepCompact_Count", "JVM_Copy_Count",
-                "JVM_PS_MarkSweep_Count", "JVM_ConcurrentMarkSweep_Count", "JVM_ParNew_Count", "JVM_PS_Scavenge_Count");
-
         class SuffixPredicate implements Predicate<String> {
             @Override
             public boolean test(String input) {
@@ -136,7 +132,7 @@ public class HttpCombiner implements Combiner {
             }
         }
 
-        Predicate<String> needAvgPredicate = new SuffixPredicate().or(input -> needAvgMetrics.contains(input));
+        Predicate<String> needAvgPredicate = new SuffixPredicate();
 
         @Override
         public Map<String, Double> get() {

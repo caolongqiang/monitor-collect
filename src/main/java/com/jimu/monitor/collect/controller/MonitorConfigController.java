@@ -53,7 +53,7 @@ public class MonitorConfigController {
 
     @RequestMapping("showEtcdGroupList.j")
     public @ResponseBody List<Group> showEtcdGroupList() throws Exception {
-        return etcdResultContainer.ETCDResultList();
+        return etcdResultContainer.etcd();
     }
 
     @RequestMapping("reloadEtcdConfig.j")

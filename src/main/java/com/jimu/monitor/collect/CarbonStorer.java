@@ -17,7 +17,12 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.jimu.monitor.Configs.config;
@@ -139,8 +144,8 @@ public class CarbonStorer implements Storer {
             log.debug("push socket : data ={} ", pushData);
             try {
                 outputStream.write(pushData.getBytes());
-            } catch (Exception e) {
-                log.error("写入carbon出错,key={},data={}", key, pushData, e);
+            } catch (Throwable t) {
+                log.error("写入carbon出错,key={},data={}", key, pushData, t);
                 close(); // 处理关闭后，才能重连
                 JMonitor.recordOne("carbon_write_error");
             }

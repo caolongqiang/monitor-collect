@@ -45,7 +45,7 @@ public class HttpClientFactory {
     private static PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManager() {
         PoolingHttpClientConnectionManager poolingHttpClientConnectionManager = new PoolingHttpClientConnectionManager();
         poolingHttpClientConnectionManager.setMaxTotal(200);
-        poolingHttpClientConnectionManager.setDefaultMaxPerRoute(100);
+        poolingHttpClientConnectionManager.setDefaultMaxPerRoute(5);
         return poolingHttpClientConnectionManager;
     }
 

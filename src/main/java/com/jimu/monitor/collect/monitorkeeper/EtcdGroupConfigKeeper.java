@@ -50,7 +50,7 @@ public class EtcdGroupConfigKeeper implements MonitorGroupKeeper {
         log.info("start refresh monitor group in etcd keeper.");
 
         Stopwatch stopwatch = Stopwatch.createStarted();
-        List<Group> groups = etcdResultContainer.ETCDResultList();
+        List<Group> groups = etcdResultContainer.etcdResultList();
         Set<Filter> whiteList = whiteListService.getWhiteList();
         log.info("crawl group list in ectd api. group size:{}", groups.size());
 

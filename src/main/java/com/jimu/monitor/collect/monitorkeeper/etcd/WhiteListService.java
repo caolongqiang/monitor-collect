@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 获取db里的app白名单 Created by zhenbao.zhou on 16/7/1.
@@ -25,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class WhiteListService {
 
     @Getter
-    Set whiteList = Sets.newHashSet();
+    private volatile Set whiteList = Sets.newHashSet();
 
     @Resource
     private FilterMapper filterMapper;
@@ -95,9 +94,7 @@ public class WhiteListService {
         });
 
         if (!set.isEmpty()) {
-            AtomicReference<Set> atomicReference = new AtomicReference<>(whiteList);
-            atomicReference.compareAndSet(whiteList, set);
-            whiteList = atomicReference.get();
+            whiteList = set;
         } else {
             log.warn("db读取出来的filter 列表为空");
             JMonitor.recordOne("reload dbFilter error");

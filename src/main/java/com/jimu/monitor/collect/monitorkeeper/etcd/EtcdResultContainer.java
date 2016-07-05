@@ -39,27 +39,28 @@ public class EtcdResultContainer {
     private final static String HOST_NAME_PREFIX = "host";
 
     // 在etcd里的所有docker实例信息
-    List<Group> allGroupsInEtcd = Lists.newArrayList();
+    // 这个地方其实可以用volatile也能搞定
+    private AtomicReference<List> ar = new AtomicReference<>();
 
-    public List<Group> ETCDResultList() {
-        return allGroupsInEtcd;
+    public List<Group> etcdResultList() {
+        return ar.get();
     }
 
     @PostConstruct
     public void init() throws Exception {
-        allGroupsInEtcd = crawlGroupListInETCD();
+            refreshJob();
 
         // 注册一个接口, 监听etcd接口变化信息
         // TODO 通过这个接口, 我现在取不到信息, 好诡异.. 到时候再看一下
     }
 
-    @Scheduled(cron = "1 */2 * * * ?") // 每2分钟的第1s执行一次
+    // 这个是全量的工作, 定时任务每五分钟执行一次.
+    // 另外有一个watcher, 监控着event api的变化. 如果发生了变化, 则会调用这个refresh job
+    @Scheduled(cron = "1 */5 * * * ?") // 每5分钟的第1s执行一次
     public void refreshJob() {
         try {
             List allGroups = crawlGroupListInETCD();
-            AtomicReference<List> atomicReference = new AtomicReference<>(allGroupsInEtcd);
-            atomicReference.compareAndSet(allGroupsInEtcd, allGroups);
-            allGroupsInEtcd = atomicReference.get();
+            ar.set(allGroups);
             log.info("got {} jobs in etcd", allGroups.size());
             JMonitor.recordSize("job_in_etcd", allGroups.size());
         } catch (Throwable t) {
@@ -109,10 +110,12 @@ public class EtcdResultContainer {
         log.debug("crawl ectd api {}, content:{}", config.getEtcdContentApi(), content);
         if (content == null) {
             log.warn("error in get etcd api content. content is null. api address is:{}", config.getEtcdContentApi());
-            JMonitor.incrRecord("etcd api size", 0, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+            JMonitor.recordSize("etcd api size", 0);
             return Lists.newArrayList();
         }
-        JMonitor.incrRecord("etcd api size", content.length(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
+
+        JMonitor.recordSize("etcd api size", content.length());
+        JMonitor.recordOne("etcd api crawl", stopwatch.elapsed(TimeUnit.MILLISECONDS));
 
         List<EtcdResult> etcdResultList = JsonUtils.readValue(content, new TypeReference<List<EtcdResult>>() {
         });
@@ -158,7 +161,7 @@ public class EtcdResultContainer {
     }
 
     // 生成这个机器对应的监控数据url. port的值为 ports: "{"8080/tcp":"172.20.0.16:1112"}"
-    // 我会取出第一个key里的8080, 和etcd里的ip合起来, 作为monitorUrl
+    // 取出第一个key里的8080, 和etcd里的ip合起来, 作为monitorUrl
     private Optional<String> generateMonitorUrl(EtcdResult etcdResult) {
         if (StringUtils.isBlank(etcdResult.getPorts())) {
             return Optional.absent();

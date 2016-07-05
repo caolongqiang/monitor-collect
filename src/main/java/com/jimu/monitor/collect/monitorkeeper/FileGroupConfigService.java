@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.jimu.monitor.Configs.config;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
@@ -46,21 +45,21 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 @Service
 public class FileGroupConfigService implements MonitorGroupKeeper {
 
-    private static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(1);
+    private static ExecutorService singleThreadPool = Executors.newSingleThreadExecutor();
 
     private final static String SUFFIX = ".json";
 
     @Getter
-    private List<Group> groupList = Lists.newArrayList();
+    private volatile List<Group> groupList = Lists.newArrayList();
 
     // key: groupKey value: group
-    private Map<String, Group> keyGroupMap = Maps.newHashMap();
+    private volatile Map<String, Group> keyGroupMap = Maps.newHashMap();
 
     // key: filePath value: groupKey
-    private Map<String, String> fileKeyMap = Maps.newHashMap();
+    private volatile Map<String, String> fileKeyMap = Maps.newHashMap();
 
     // key: groupKey value: filePath
-    private Map<String, String> keyFileMap = Maps.newHashMap();
+    private volatile Map<String, String> keyFileMap = Maps.newHashMap();
 
     private WatchService watchService;
 
@@ -101,7 +100,7 @@ public class FileGroupConfigService implements MonitorGroupKeeper {
 
         if (config.isMonitorAutoRefresh()) {
             log.info("monitor auto refresh. register watchService");
-            fixedThreadPool.execute(new FileChangeListener(watchService));
+            singleThreadPool.execute(new FileChangeListener(watchService));
         }
 
         calcLatestGroups();
@@ -124,17 +123,9 @@ public class FileGroupConfigService implements MonitorGroupKeeper {
     }
 
     public void reload() throws IOException {
-        AtomicReference<Map> ar = new AtomicReference(keyGroupMap);
-        ar.compareAndSet(keyGroupMap, Maps.newHashMap());
-        keyGroupMap = ar.get();
-
-        ar = new AtomicReference<>(fileKeyMap);
-        ar.compareAndSet(fileKeyMap, Maps.newHashMap());
-        fileKeyMap = ar.get();
-
-        ar = new AtomicReference<>(keyFileMap);
-        ar.compareAndSet(keyFileMap, Maps.newHashMap());
-        keyFileMap = ar.get();
+        keyGroupMap = Maps.newHashMap();
+        fileKeyMap = Maps.newHashMap();
+        keyFileMap = Maps.newHashMap();
 
         calcLatestGroups();
     }
@@ -246,14 +237,11 @@ public class FileGroupConfigService implements MonitorGroupKeeper {
      * 更新最新的group list
      */
     private void updateGroupList() {
-        AtomicReference<List> ar = new AtomicReference<>(groupList);
         if (MapUtils.isEmpty(keyGroupMap)) {
-            ar.compareAndSet(groupList, Lists.newArrayList());
+            groupList =  Lists.newArrayList();
         } else {
-            ar.compareAndSet(groupList, new ArrayList<>(keyGroupMap.values()));
+            groupList = new ArrayList<>(keyGroupMap.values());
         }
-
-        groupList = ar.get();
     }
 
     enum Operation {

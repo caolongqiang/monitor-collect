@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -42,16 +43,19 @@ public class EtcdResultContainer {
     // 这个地方其实可以用volatile也能搞定
     private AtomicReference<List> ar = new AtomicReference<>();
 
+    @Autowired
+    EtcdEventWatcher etcdEventWatcher;
+
     public List<Group> etcdResultList() {
         return ar.get();
     }
 
     @PostConstruct
     public void init() throws Exception {
-            refreshJob();
+        refreshJob();
 
-        // 注册一个接口, 监听etcd接口变化信息
-        // TODO 通过这个接口, 我现在取不到信息, 好诡异.. 到时候再看一下
+        // 监听etcd event api的接口
+        etcdEventWatcher.watch();
     }
 
     // 这个是全量的工作, 定时任务每五分钟执行一次.
@@ -74,31 +78,32 @@ public class EtcdResultContainer {
      * 从api里获取内容 ETCD 的API内容是
      * 
      * <pre>
-     *      [
-     {
-     app: "bbae-www",
-     env: "production",
-     gen: "50",
-     name: "bbae-www.production.gen-50.seq-1@docker-cdsus-09",
-     id: "bbb8e9acf01a07241aa4371e02ae616b9d09a1211df71c259b1d242aae749b60",
-     ip: "172.20.17.2",
-     ports: "{"8080/tcp":"172.20.0.17:1098"}",
-     host: "docker-cdsus-09",
-     app_check: "0"
-     },
-     {
-     app: "bbae-www",
-     env: "production",
-     gen: "50",
-     name: "bbae-www.production.gen-50.seq-2@docker-cdsus-08",
-     id: "3d06021794e22778011408ac0aa36253d4df523262bcc725c3d7dc04bb28dc18",
-     ip: "172.20.16.3",
-     ports: "{"8080/tcp":"172.20.0.16:1112"}",
-     host: "docker-cdsus-08",
-     app_check: "0"
-     }
-     ]
-     *
+     *     <code>
+     *[
+     *    {
+     *      app: "bbae-www",
+     *      env: "production",
+     *      gen: "50",
+     *      name: "bbae-www.production.gen-50.seq-1@docker-cdsus-09",
+     *      id: "bbb8e9acf01a07241aa4371e02ae616b9d09a1211df71c259b1d242aae749b60",
+     *      ip: "172.20.17.2",
+     *      ports: "{"8080/tcp":"172.20.0.17: 1098"}",
+     *      host: "docker-cdsus-09",
+     *      app_check: "0"
+     *     },
+     *     {
+     *      app: "bbae-www",
+     *      env: "production",
+     *      gen: "50",
+     *      name: "bbae-www.production.gen-50.seq-2@docker-cdsus-08",
+     *      id: "3d06021794e22778011408ac0aa36253d4df523262bcc725c3d7dc04bb28dc18",
+     *      ip: "172.20.16.3",
+     *      ports: "{"8080/tcp":"172.20.0.16: 1112"}",
+     *      host: "docker-cdsus-08",
+     *      app_check: "0"
+     *      }
+     *  ]
+     *     </code>
      * </pre>
      * 
      * @return
@@ -160,8 +165,14 @@ public class EtcdResultContainer {
         return groupList;
     }
 
-    // 生成这个机器对应的监控数据url. port的值为 ports: "{"8080/tcp":"172.20.0.16:1112"}"
-    // 取出第一个key里的8080, 和etcd里的ip合起来, 作为monitorUrl
+    /**
+     *
+     * 生成这个机器对应的监控数据url. port的值为 ports: "{"8080/tcp":"172.20.0.16:1112"}" <br/>
+     * 取出第一个key里的8080, 和etcd里的ip合起来, 作为monitorUrl
+     *
+     * @param etcdResult
+     * @return
+     */
     private Optional<String> generateMonitorUrl(EtcdResult etcdResult) {
         if (StringUtils.isBlank(etcdResult.getPorts())) {
             return Optional.absent();

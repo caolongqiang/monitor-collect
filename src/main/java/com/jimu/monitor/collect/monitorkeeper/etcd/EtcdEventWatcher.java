@@ -27,7 +27,7 @@ import static com.jimu.monitor.Configs.config;
  */
 @Slf4j
 @Service
-public class EtcdContentWatcher {
+public class EtcdEventWatcher {
 
     /**
      * 启动watcher的线程池
@@ -39,24 +39,25 @@ public class EtcdContentWatcher {
      */
     private final static ExecutorService refreshExecutor = Executors.newSingleThreadExecutor();
 
-    private final static int CONNECTION_TIMEOUT = 1000; // 1s
-    private final static int REQUEST_TIMEOUT = 3 * 60 * 1000; // 3min
+    private final static int CONNECTION_TIMEOUT_IN_MS = 1000; // 1s
+    private final static int REQUEST_TIMEOUT_IN_MS = 3 * 60 * 1000; // 3min
     private final static int WORKER_DELAY_TIME_IN_SECOND = 20; // 20s
+    private final static int INIT_DELAY_IN_MS = 1000; // 1s
+
     private final static int MAX_CONNECTION = 2;
-    private final static int INIT_DEALY = 1000; // 1s
 
     private final static AsyncHttpClientConfig asyncConfig = new AsyncHttpClientConfig.Builder()
-            .setMaxConnections(MAX_CONNECTION).setRequestTimeout(REQUEST_TIMEOUT).setConnectTimeout(CONNECTION_TIMEOUT)
-            .build();
+            .setMaxConnections(MAX_CONNECTION).setRequestTimeout(REQUEST_TIMEOUT_IN_MS)
+            .setConnectTimeout(CONNECTION_TIMEOUT_IN_MS).build();
 
     @Autowired
     EtcdResultContainer etcdResultContainer;
 
     // 单例
-    private static WatchWorker watchWorker = new EtcdContentWatcher().new WatchWorker();
+    private static WatchWorker watchWorker = new EtcdEventWatcher().new WatchWorker();
 
     public void watch() {
-        workerExecutor.schedule(watchWorker, INIT_DEALY, TimeUnit.MILLISECONDS);
+        workerExecutor.schedule(watchWorker, INIT_DELAY_IN_MS, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -112,6 +113,21 @@ public class EtcdContentWatcher {
             });
         }
 
+        /**
+         * content的信息请参考 http://git.jimubox.com/snippets/24
+         * 目前看到的信息是
+         * 
+         * <pre>
+         *     {
+         *         "action":"takeover", //动作 takeover 为发布
+         *         "app":"merak-in-auth", //应用
+         *         "env":"production", //环境
+         *         "gen":"26"  //发布次数
+         *     }
+         * </pre>
+         * 
+         * @param responseBodyPart
+         */
         void dealContent(HttpResponseBodyPart responseBodyPart) {
             final int MIN_LENGTH = 4;
             if (responseBodyPart.length() < MIN_LENGTH) {
@@ -159,7 +175,7 @@ public class EtcdContentWatcher {
     }
 
     public static void main(String[] args) {
-        EtcdContentWatcher watcher = new EtcdContentWatcher();
+        EtcdEventWatcher watcher = new EtcdEventWatcher();
         watcher.watch();
     }
 }

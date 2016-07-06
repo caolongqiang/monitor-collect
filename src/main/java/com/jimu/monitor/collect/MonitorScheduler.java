@@ -54,8 +54,10 @@ public class MonitorScheduler {
         final static Map<String, MonitorTimerTask> container = Maps.newConcurrentMap();
 
         static MonitorTimerTask of(Group group) {
-            container.putIfAbsent(group.groupKey(), new MonitorTimerTask(group));
-            return container.get(group.groupKey());
+            container.putIfAbsent(group.groupKey(), new MonitorTimerTask());
+            MonitorTimerTask task = container.get(group.groupKey());
+            task.setGroup(group);
+            return task;
         }
     }
 }

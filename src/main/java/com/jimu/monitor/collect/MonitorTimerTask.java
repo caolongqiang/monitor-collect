@@ -18,8 +18,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.jimu.monitor.Configs.config;
-
 /**
  * 具体运行的定时任务<br/>
  *
@@ -38,12 +36,12 @@ public final class MonitorTimerTask implements Runnable {
     private DateTime lastTime = DateTime.now().minusMinutes(1);
 
     // private Storer storer = new LogStorer();
-    private Storer storer = ApplicationContextHelper.popBean(CarbonStorer.class);
+    private final Storer storer = ApplicationContextHelper.popBean(CarbonStorer.class);
 
     private volatile boolean running = false;
 
     @Override
-    public synchronized void run() {
+    public void run() {
         if (!meetPrecondition()) {
             log.debug("任务暂时不能执行. group:{}", group);
             return;

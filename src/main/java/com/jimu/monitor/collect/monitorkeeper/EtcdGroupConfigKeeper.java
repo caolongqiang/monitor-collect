@@ -4,7 +4,6 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.jimu.common.jmonitor.JMonitor;
 import com.jimu.monitor.collect.bean.Group;
-import com.jimu.monitor.collect.db.Filter;
 import com.jimu.monitor.collect.monitorkeeper.etcd.EtcdResultContainer;
 import com.jimu.monitor.collect.monitorkeeper.etcd.WhiteListService;
 import com.jimu.monitor.utils.JsonUtils;
@@ -16,7 +15,6 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -51,7 +49,7 @@ public class EtcdGroupConfigKeeper implements MonitorGroupKeeper {
 
         Stopwatch stopwatch = Stopwatch.createStarted();
         List<Group> groups = etcdResultContainer.etcdResultList();
-        Set<Filter> whiteList = whiteListService.getWhiteList();
+        Set<String> whiteList = whiteListService.getWhiteList();
         log.info("crawl group list in ectd api. group size:{}", groups.size());
 
         List<Group> filtered = groups.stream().filter(group -> whiteList.contains(group.getName()))

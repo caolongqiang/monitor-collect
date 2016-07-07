@@ -2,10 +2,8 @@ package com.jimu.monitor.collect;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.google.common.util.concurrent.SettableFuture;
 import com.jimu.common.jmonitor.JMonitor;
 import com.jimu.monitor.collect.bean.Domain;
 import com.jimu.monitor.collect.bean.Packet;
@@ -19,7 +17,6 @@ import java.util.concurrent.Executors;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.jimu.monitor.Configs.config;
 
 /**
  * 从提供http服务的应用里, 解释内容, 变成原始的监控指标, 存放在packet里
@@ -29,9 +26,9 @@ import static com.jimu.monitor.Configs.config;
 @Slf4j
 public class HttpCollector implements Collector {
 
-    protected final Domain domain;
+    private final Domain domain;
 
-    static ListeningExecutorService threadPool;
+    private final static ListeningExecutorService threadPool;
     
     private final static int MAX_THREAD_NUM = 100;
 

@@ -8,7 +8,6 @@ import com.jimu.monitor.collect.bean.Group;
 import com.jimu.monitor.collect.bean.GroupMetric;
 import com.jimu.monitor.exception.MonitorException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;

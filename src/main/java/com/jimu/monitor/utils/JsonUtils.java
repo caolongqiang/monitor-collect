@@ -18,7 +18,7 @@ public class JsonUtils {
 
     private static final Logger log = LoggerFactory.getLogger(JsonUtils.class);
 
-    public static final ObjectMapper OM = new ObjectMapper();
+    private static final ObjectMapper OM = new ObjectMapper();
 
     static {
         OM.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

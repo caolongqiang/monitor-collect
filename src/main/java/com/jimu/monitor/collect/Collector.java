@@ -1,6 +1,5 @@
 package com.jimu.monitor.collect;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.jimu.monitor.collect.bean.Packet;
 
 import java.util.concurrent.CompletableFuture;

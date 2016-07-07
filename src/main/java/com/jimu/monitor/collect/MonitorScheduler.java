@@ -29,7 +29,7 @@ public class MonitorScheduler {
     private MonitorGroupKeeper fileGroupKeeper;
 
     // 无界队列,不丢弃采集任务
-    private Executor threadPoolExecutor = Executors.newFixedThreadPool(100);
+    private final Executor threadPoolExecutor = Executors.newFixedThreadPool(100);
 
     @Scheduled(cron = "32 * * * * ?") // 每分钟的第32s执行一次
     public void scheduleJob() {

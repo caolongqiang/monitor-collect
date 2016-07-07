@@ -24,8 +24,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 
-import static com.jimu.monitor.Configs.config;
-
 /**
  * 合并同一个组内的属性. Created by zhenbao.zhou on 16/5/26.
  */
@@ -65,20 +63,20 @@ public class HttpCombiner implements Combiner {
      * 计算单机指标值. 以_count结尾的, 要除以60, 变成qps
      */
     private static class DomainMetricCalculator implements Supplier<Map> {
-        private Packet packet;
+        private final Packet packet;
 
         DomainMetricCalculator(Packet packet) {
             this.packet = packet;
         }
 
         // 暂时没有用到, 先保留在这里. 保留原有的功能
-        Set<String> qpsMetrics = ImmutableSet.of();
+        final Set<String> qpsMetrics = ImmutableSet.of();
 
         /**
          * 遍历transformer, 第一个满足的(任意一个满足的),则直接返回. 因此, 注意条件的互斥性. 如果需要顺序, 用linked hash map来解决
          * <p>
          */
-        Map<Predicate<String>, Function<Double, Double>> transformer = ImmutableMap.of(
+        final Map<Predicate<String>, Function<Double, Double>> transformer = ImmutableMap.of(
                // (key) -> StringUtils.endsWithIgnoreCase(key, "_TIME"), (value) -> value / 1E6,
 
                 (key) -> StringUtils.endsWithIgnoreCase(key, "_COUNT")
@@ -118,7 +116,7 @@ public class HttpCombiner implements Combiner {
             this.domainMeasurements = domainMeasurements;
         }
 
-        static Set<String> needAvgSuffixes = ImmutableSet.of("_Time", "_CACHE_Value", "_RADIO_L_Value", "_RADIO_Value");
+        final static Set<String> needAvgSuffixes = ImmutableSet.of("_Time", "_CACHE_Value", "_RADIO_L_Value", "_RADIO_Value");
 
         static class SuffixPredicate implements Predicate<String> {
             @Override
@@ -132,7 +130,7 @@ public class HttpCombiner implements Combiner {
             }
         }
 
-        Predicate<String> needAvgPredicate = new SuffixPredicate();
+        final Predicate<String> needAvgPredicate = new SuffixPredicate();
 
         @Override
         public Map<String, Double> get() {

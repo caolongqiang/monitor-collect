@@ -1,5 +1,6 @@
 package com.jimu.monitor.collect.monitorkeeper.etcd;
 
+import com.google.common.base.Preconditions;
 import com.jimu.common.jmonitor.JMonitor;
 import com.jimu.monitor.utils.JsonUtils;
 import com.ning.http.client.AsyncHandler;
@@ -56,7 +57,7 @@ public class EtcdEventWatcher {
     private final static AsyncHttpClient client = new AsyncHttpClient(asyncConfig);
 
     // 单例
-    private static WatchWorker watchWorker = new EtcdEventWatcher().new WatchWorker();
+    private final static WatchWorker watchWorker = new EtcdEventWatcher().new WatchWorker();
 
     public void watch() {
         workerExecutor.schedule(watchWorker, INIT_DELAY_IN_MS, TimeUnit.MILLISECONDS);
@@ -130,13 +131,13 @@ public class EtcdEventWatcher {
          * @param responseBodyPart
          */
         void dealContent(HttpResponseBodyPart responseBodyPart) {
-            final int MIN_LENGTH = 4;
-            if (responseBodyPart.length() < MIN_LENGTH) {
-                log.debug("got message. length:{}", responseBodyPart.length());
-                return;
-            }
+            Preconditions.checkNotNull(responseBodyPart);
 
             String content = new String(responseBodyPart.getBodyPartBytes());
+            if(StringUtils.isBlank(content)) {
+                log.info("获取的信息为空. 不处理这条消息");
+                return;
+            }
             log.info("deal content. content:{}", content);
             EventBody eventBody = JsonUtils.readValue(content, EventBody.class);
             if (eventBody == null) {
@@ -154,9 +155,7 @@ public class EtcdEventWatcher {
             log.info("refresh etcd content by watcher. go");
 
             // TODO 这个地方将来性能可能也有问题. 其实最好的方法是, 只reload这一个发生了变化的job的相关属性.
-            refreshExecutor.execute(() -> {
-                etcdResultContainer.refreshJob();
-            });
+            refreshExecutor.execute(() -> etcdResultContainer.refreshJob());
 
         }
     }

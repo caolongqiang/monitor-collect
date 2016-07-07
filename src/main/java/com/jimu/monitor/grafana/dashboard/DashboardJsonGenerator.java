@@ -27,7 +27,7 @@ public enum DashboardJsonGenerator {
     generator;
 
     // template是线程安全的
-    Template template;
+    final Template template;
 
     DashboardJsonGenerator() {
         Properties p = new Properties();

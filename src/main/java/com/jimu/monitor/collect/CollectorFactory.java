@@ -7,7 +7,7 @@ import com.jimu.monitor.exception.MonitorException;
 /**
  * Created by zhenbao.zhou on 16/5/26.
  */
-public class CollectorFactory {
+class CollectorFactory {
     public static Collector of(Domain domain) {
         if (domain.getType() == Group.Type.HTTP) {
             return new HttpCollector(domain);

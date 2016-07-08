@@ -17,7 +17,7 @@
 "panels": [
 {
 "aliasColors": {},
-"bars": false,
+"bars": true,
 "datasource": null,
 "editable": true,
 "error": false,
@@ -39,7 +39,7 @@
 "total": false,
 "values": false
 },
-"lines": true,
+"lines": false,
 "linewidth": 2,
 "links": [],
 "minSpan": 6,

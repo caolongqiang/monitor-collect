@@ -2,6 +2,7 @@ package com.jimu.monitor.collect.monitorkeeper.etcd;
 
 import com.google.common.base.Preconditions;
 import com.jimu.common.jmonitor.JMonitor;
+import com.jimu.monitor.utils.ApplicationContextHelper;
 import com.jimu.monitor.utils.JsonUtils;
 import com.ning.http.client.AsyncHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -13,7 +14,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ExecutorService;
@@ -50,9 +50,6 @@ public class EtcdEventWatcher {
     private final static AsyncHttpClientConfig asyncConfig = new AsyncHttpClientConfig.Builder()
             .setMaxConnections(MAX_CONNECTION).setRequestTimeout(REQUEST_TIMEOUT_IN_MS)
             .setConnectTimeout(CONNECTION_TIMEOUT_IN_MS).build();
-
-    @Autowired
-    EtcdResultContainer etcdResultContainer;
 
     private final static AsyncHttpClient client = new AsyncHttpClient(asyncConfig);
 
@@ -134,7 +131,7 @@ public class EtcdEventWatcher {
             Preconditions.checkNotNull(responseBodyPart);
 
             String content = new String(responseBodyPart.getBodyPartBytes());
-            if(StringUtils.isBlank(content)) {
+            if (StringUtils.isBlank(content)) {
                 log.info("获取的信息为空. 不处理这条消息");
                 return;
             }
@@ -155,7 +152,10 @@ public class EtcdEventWatcher {
             log.info("refresh etcd content by watcher. go");
 
             // TODO 这个地方将来性能可能也有问题. 其实最好的方法是, 只reload这一个发生了变化的job的相关属性.
-            refreshExecutor.execute(() -> etcdResultContainer.refreshJob());
+            refreshExecutor.execute(() -> {
+                EtcdResultContainer container = ApplicationContextHelper.popBean(EtcdResultContainer.class);
+                container.refreshJob();
+            });
 
         }
     }

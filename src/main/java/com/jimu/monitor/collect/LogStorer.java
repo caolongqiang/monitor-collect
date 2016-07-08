@@ -3,7 +3,6 @@ package com.jimu.monitor.collect;
 import com.jimu.monitor.collect.bean.GroupMetric;
 import com.jimu.monitor.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 /**
  * 这是一个测试的程序. 调试使用的

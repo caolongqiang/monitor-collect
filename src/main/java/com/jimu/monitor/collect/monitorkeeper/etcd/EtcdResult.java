@@ -1,14 +1,9 @@
 package com.jimu.monitor.collect.monitorkeeper.etcd;
 
-import com.google.common.base.Optional;
-import com.jimu.common.jmonitor.JMonitor;
-import com.jimu.monitor.utils.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Map;
 
 /**
  * 保存etcd返回回来的信息. 具体的内容

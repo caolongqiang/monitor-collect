@@ -19,12 +19,16 @@ import java.util.concurrent.TimeUnit;
 /**
  * 获取db里的app白名单 Created by zhenbao.zhou on 16/7/1.
  */
+@SuppressWarnings("ALL")
 @Service
 @Slf4j
 public class WhiteListService {
 
+    /**
+     * 保存的是可以被使用的应用名
+     */
     @Getter
-    private volatile Set whiteList = Sets.newHashSet();
+    private volatile Set<String> whiteList = Sets.newHashSet();
 
     @Resource
     private FilterMapper filterMapper;
@@ -89,9 +93,7 @@ public class WhiteListService {
         List<Filter> filterList = filterMapper.queryAvailableFilterList();
         log.info("reload db filter 从数据库去取filter结束.  filterListSize:{}", filterList.size());
         JMonitor.recordOne("load filter from db.", stopwatch.elapsed(TimeUnit.MILLISECONDS));
-        filterList.forEach(filter -> {
-            set.add(SetKeyGenerator.gen(filter.getEnv(), filter.getApp()));
-        });
+        filterList.forEach(filter -> set.add(SetKeyGenerator.gen(filter.getEnv(), filter.getApp())));
 
         if (!set.isEmpty()) {
             whiteList = set;

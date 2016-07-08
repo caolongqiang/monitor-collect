@@ -69,10 +69,6 @@ public enum Configs {
         return Integer.parseInt(properties.getProperty("dashboard.refresh.interval", "").trim());
     }
 
-    public boolean isMonitorAutoRefresh() {
-        return "true".equalsIgnoreCase(properties.getProperty("monitor.autorefresh", "").trim());
-    }
-
     public String getEtcdContentApi() {
         return properties.getProperty("etcd.content.api", "").trim();
     }

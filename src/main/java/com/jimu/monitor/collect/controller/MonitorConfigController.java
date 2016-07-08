@@ -119,7 +119,6 @@ public class MonitorConfigController {
 
     @RequestMapping("index.j")
     public ModelAndView showWhiteList() {
-        ModelAndView mv = new ModelAndView("whitelist");
-        return mv;
+        return new ModelAndView("whitelist");
     }
 }

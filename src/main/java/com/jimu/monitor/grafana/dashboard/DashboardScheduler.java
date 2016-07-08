@@ -4,16 +4,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
 import com.google.common.base.Stopwatch;
 import com.jimu.common.jmonitor.JMonitor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-
-import static com.jimu.monitor.Configs.config;
 
 /**
  * 调度服务的入口, 读取任务 Created by zhenbao.zhou on 2016/5/25

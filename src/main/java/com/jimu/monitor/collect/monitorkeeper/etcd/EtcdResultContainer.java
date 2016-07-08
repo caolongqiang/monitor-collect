@@ -1,7 +1,6 @@
 package com.jimu.monitor.collect.monitorkeeper.etcd;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.base.Optional;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
@@ -23,6 +22,7 @@ import javax.annotation.PostConstruct;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -41,7 +41,7 @@ public class EtcdResultContainer {
 
     // 在etcd里的所有docker实例信息
     // 这个地方其实可以用volatile也能搞定
-    private AtomicReference<List> ar = new AtomicReference<>();
+    private AtomicReference<List<Group>> ar = new AtomicReference<>();
 
     @Autowired
     EtcdEventWatcher etcdEventWatcher;
@@ -62,7 +62,7 @@ public class EtcdResultContainer {
     @Scheduled(cron = "1 */5 * * * ?") // 每5分钟的第1s执行一次
     public void refreshJob() {
         try {
-            List allGroups = crawlGroupListInETCD();
+            List<Group> allGroups = crawlGroupListInETCD();
             ar.set(allGroups);
             log.info("got {} jobs in etcd", allGroups.size());
             JMonitor.recordSize("job_in_etcd", allGroups.size());
@@ -146,8 +146,8 @@ public class EtcdResultContainer {
         // 合并相同的app
         SetMultimap<String, String> setMultimap = HashMultimap.create();
 
-        etcdList.stream().filter(etcd -> generateMonitorUrl(etcd).isPresent()).forEach(
-                etcd -> setMultimap.put(SetKeyGenerator.gen(etcd.env, etcd.app), generateMonitorUrl(etcd).get()));
+        etcdList.stream().filter(etcd -> generateMonitorUrl(etcd).isPresent())
+                .forEach(etcd -> setMultimap.put(SetKeyGenerator.gen(etcd.env, etcd.app), generateMonitorUrl(etcd).get()));
 
         // 取出来
         setMultimap.asMap().forEach((name, urlSet) -> {
@@ -174,13 +174,13 @@ public class EtcdResultContainer {
      */
     private Optional<String> generateMonitorUrl(EtcdResult etcdResult) {
         if (StringUtils.isBlank(etcdResult.getPorts())) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         Map<String, String> portMap = JsonUtils.readValue(etcdResult.ports, Map.class);
         if (MapUtils.isEmpty(portMap)) {
             log.debug("ports 转换异常. ports:{}, etcdResult:{}", etcdResult.ports, JsonUtils.writeValueAsString(this));
-            return Optional.absent();
+            return Optional.empty();
         }
 
         try {
@@ -192,7 +192,7 @@ public class EtcdResultContainer {
             // 有时返回的数据里, 没有port, 是正常的
             JMonitor.recordOne("etcd_ports_change_error");
             log.warn("error in got port. port:{}", etcdResult.getPorts(), e);
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 }

@@ -2,7 +2,6 @@ package com.jimu.monitor.collect.monitorkeeper;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
-import com.jimu.monitor.Configs;
 import com.jimu.monitor.collect.bean.Group;
 import com.jimu.monitor.utils.JsonUtils;
 import lombok.Getter;
@@ -10,11 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +21,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.google.common.io.Resources.getResource;
 import static com.jimu.monitor.Configs.config;
 
 /**
@@ -66,10 +62,13 @@ public class FileGroupConfigService implements MonitorGroupKeeper {
         List<Group> groups = Lists.newArrayList();
         try {
             Files.walkFileTree(path, fileVisitor);
-            groups = monitorFiles.stream().filter(file -> file.getName().endsWith(SUFFIX) && !file.isHidden())
-                    .map(file -> fillGroupList(file)).filter(group -> group != null).collect(Collectors.toList());
+            groups = monitorFiles.stream()
+                    .filter(file -> file.getName().endsWith(SUFFIX) && !file.isHidden())
+                    .map(this::fillGroupList)
+                    .filter(group -> group != null)
+                    .collect(Collectors.toList());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("序列化成group时出错.", e);
         }
 
         groupList = groups;

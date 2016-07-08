@@ -6,7 +6,7 @@ import com.jimu.monitor.exception.MonitorException;
 /**
  * Created by zhenbao.zhou on 16/5/27.
  */
-public class CombinerFactory {
+class CombinerFactory {
     public static Combiner of(Group group) {
         if (group.getType() == Group.Type.HTTP) {
             return new HttpCombiner();

@@ -31,7 +31,7 @@ public enum Pusher {
 
     private final static Executor executor = Executors.newFixedThreadPool(5);
 
-    Map<String, String> headerMap = ImmutableMap.of("Content-Type", "application/json", "Accept", "application/json",
+    final Map<String, String> headerMap = ImmutableMap.of("Content-Type", "application/json", "Accept", "application/json",
             "Authorization", config.getGrafanaAuthorization());
 
     /**

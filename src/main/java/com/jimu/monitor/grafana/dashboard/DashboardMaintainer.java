@@ -165,6 +165,7 @@ public class DashboardMaintainer implements Runnable {
         });
 
         if (existsDBList == null) {
+            log.warn("生成现有db title list失败. content:{}", content);
             JMonitor.recordOne("error grafana db api search");
             return Sets.newHashSet();
         }

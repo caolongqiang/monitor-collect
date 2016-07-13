@@ -30,7 +30,6 @@ public class EtcdGroupConfigKeeper implements MonitorGroupKeeper {
     @Resource
     WhiteListService whiteListService;
 
-    // groupList需要是一个cow list哦. 别用错了.
     // 只有这个group 才进行抓取任务
     private volatile List<Group> groupList = Lists.newArrayList();
 

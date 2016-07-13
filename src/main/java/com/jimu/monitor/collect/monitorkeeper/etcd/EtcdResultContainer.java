@@ -66,6 +66,7 @@ public class EtcdResultContainer {
             ar.set(allGroups);
             log.info("got {} jobs in etcd", allGroups.size());
             JMonitor.recordSize("job_in_etcd", allGroups.size());
+            log.debug("all whitelist groups:", JsonUtils.writeValueAsString(allGroups));
         } catch (Throwable t) {
             log.info("error in refresh job.", t);
             JMonitor.recordOne("refresh etcd content error");

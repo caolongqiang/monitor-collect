@@ -21,7 +21,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.jimu.monitor.collect.LogStorer" level="DEBUG" />
+    <logger name="com.jimu.monitor.collect.monitorkeeper.EtcdResultContainer" level="DEBUG" />
 
     <root level="INFO">
         <appender-ref ref="logAppender"/>

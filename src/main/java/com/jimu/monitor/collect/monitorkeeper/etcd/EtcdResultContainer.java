@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,8 @@ import static com.jimu.monitor.Configs.config;
 @Service
 @Slf4j
 public class EtcdResultContainer {
+
+    private final static Logger etcdLog = LoggerFactory.getLogger("etcdLog");
 
     private final static String HOST_NAME_PREFIX = "host";
 
@@ -66,7 +70,6 @@ public class EtcdResultContainer {
             ar.set(allGroups);
             log.info("got {} jobs in etcd", allGroups.size());
             JMonitor.recordSize("job_in_etcd", allGroups.size());
-            log.debug("all whitelist groups:", JsonUtils.writeValueAsString(allGroups));
         } catch (Throwable t) {
             log.info("error in refresh job.", t);
             JMonitor.recordOne("refresh etcd content error");
@@ -112,7 +115,7 @@ public class EtcdResultContainer {
         Stopwatch stopwatch = Stopwatch.createStarted();
 
         String content = HttpClientHelper.get(config.getEtcdContentApi());
-        log.debug("crawl ectd api {}, content:{}", config.getEtcdContentApi(), content);
+        etcdLog.info("crawl ectd api {}, content:{}", config.getEtcdContentApi(), content);
         if (content == null) {
             log.warn("error in get etcd api content. content is null. api address is:{}", config.getEtcdContentApi());
             JMonitor.recordSize("etcd api size", 0);

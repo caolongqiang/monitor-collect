@@ -30,23 +30,13 @@ public class EtcdGroupConfigKeeper implements MonitorGroupKeeper {
     @Resource
     WhiteListService whiteListService;
 
-    // 只有这个group 才进行抓取任务
-    private volatile List<Group> groupList = Lists.newArrayList();
-
-    public List<Group> getGroupList() {
-        if (groupList.size() == 0) {
-            refresh();
-        }
-        return groupList;
-    }
-
     /**
-     * 更新白名单
+     * 每次都从etcd所有的全量和 db里的白名单里, 重新计算现在需要抓取的配置。
+     * 这个程序理论上来说, 一分钟调用一次, 所以性能不是问题, 也不用存储过滤后的结果
      */
-    public void refresh() {
+    public List<Group> getGroupList() {
         log.info("start refresh monitor group in etcd keeper.");
 
-        Stopwatch stopwatch = Stopwatch.createStarted();
         List<Group> groups = etcdResultContainer.etcdResultList();
         Set<String> whiteList = whiteListService.getWhiteList();
         log.info("crawl group list in ectd api. group size:{}", groups.size());
@@ -57,15 +47,8 @@ public class EtcdGroupConfigKeeper implements MonitorGroupKeeper {
         log.info("stop refresh monitor group in etcd. filtered size:{}", filtered);
         log.debug("filtered group list:{}", JsonUtils.writeValueAsString(filtered));
 
-        // TODO 其实这里最好做一个比较, 改变的比例大于多少时, 也放弃这次更新.
-        if (CollectionUtils.isNotEmpty(filtered)) {
-            groupList = filtered;
-            log.info("change groupList. groupListSize:{}", groupList.size());
-        } else {
-            JMonitor.recordOne("filtered group list empty");
-        }
-
-        JMonitor.incrRecord("refresh group list", groupList.size(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
+        JMonitor.recordSize("crawl group list size", filtered.size());
+        return filtered;
     }
 
 }

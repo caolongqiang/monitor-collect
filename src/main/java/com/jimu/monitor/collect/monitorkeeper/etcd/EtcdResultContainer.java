@@ -8,6 +8,7 @@ import com.google.common.collect.SetMultimap;
 import com.jimu.common.jmonitor.JMonitor;
 import com.jimu.monitor.collect.bean.Domain;
 import com.jimu.monitor.collect.bean.Group;
+import com.jimu.monitor.collect.monitorkeeper.EtcdGroupConfigKeeper;
 import com.jimu.monitor.utils.HttpClientHelper;
 import com.jimu.monitor.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,9 @@ public class EtcdResultContainer {
 
     @Autowired
     EtcdEventWatcher etcdEventWatcher;
+
+    @Resource
+    EtcdGroupConfigKeeper etcdGroupConfigKeeper;
 
     public List<Group> etcdResultList() {
         return ar.get();

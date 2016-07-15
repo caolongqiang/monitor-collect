@@ -60,8 +60,6 @@ public class MonitorConfigController {
     public @ResponseBody String reloadEtcdConfig() throws Exception {
         etcdResultContainer.refreshJob();
 
-        // 更新整个etcd的结果
-        etcdGroupConfigKeeper.refresh();
         return "reload reloadEtcdConfig success";
     }
 
@@ -74,9 +72,6 @@ public class MonitorConfigController {
     public @ResponseBody JsonData reloadWhiteList() throws Exception {
         log.info("reload whitelist in db");
         whiteListService.reloadDBFilter();
-
-        // 更新整个etcd的结果
-        etcdGroupConfigKeeper.refresh();
 
         return JsonData.success("reload whitelist success");
     }

@@ -116,7 +116,7 @@ public class HttpCombiner implements Combiner {
             this.domainMeasurements = domainMeasurements;
         }
 
-        final static Set<String> needAvgSuffixes = ImmutableSet.of("_Time", "_CACHE_Value", "_RADIO_L_Value", "_RADIO_Value");
+        final static Set<String> needAvgSuffixes = ImmutableSet.of("_Time", "_CACHE_Value", "_RATIO_L_Value", "_RATIO_Value");
 
         static class SuffixPredicate implements Predicate<String> {
             @Override

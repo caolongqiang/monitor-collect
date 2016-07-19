@@ -32,12 +32,13 @@
 "isNew": true,
 "legend": {
 "avg": true,
-"current": false,
+"current": true,
 "max": true,
 "min": true,
 "show": true,
-"total": false,
-"values": false
+"total": true,
+"values": true,
+"alignAsTable": true
 },
 "lines": false,
 "linewidth": 2,
@@ -153,7 +154,8 @@
 "options": ${domain_selector_option},
 "query": "${domain_name_query}.*",
 "refresh": 1,
-"type": "query"
+"type": "query",
+
 },
 {
 "current": {
@@ -168,7 +170,8 @@
 "options": ${metric_selector_option},
 "query": "${domain_name_query}.$domain_name.*",
 "refresh": 1,
-"type": "query"
+"type": "query",
+"allValue": "*"
 }
 ]
 },

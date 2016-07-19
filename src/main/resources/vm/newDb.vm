@@ -154,8 +154,7 @@
 "options": ${domain_selector_option},
 "query": "${domain_name_query}.*",
 "refresh": 1,
-"type": "query",
-
+"type": "query"
 },
 {
 "current": {

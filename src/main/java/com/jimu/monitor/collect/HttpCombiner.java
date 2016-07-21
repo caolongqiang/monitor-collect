@@ -91,7 +91,7 @@ public class HttpCombiner implements Combiner {
          */
         @Override
         public Map<String, Double> get() {
-            return packet.getRawMeasurements().entrySet().stream().filter(entry -> entry.getValue() > 0)
+            return packet.getRawMeasurements().entrySet().stream().filter(entry -> entry.getValue() >= 0)
                     .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                         for (Predicate<String> predicate : transformer.keySet()) {
                             if (predicate.test(entry.getKey())) {
@@ -139,7 +139,7 @@ public class HttpCombiner implements Combiner {
             Map<String, Double> retMap = Maps.newHashMap();
             domainMeasurements.columnMap().entrySet().forEach(entry -> {
                 DoubleStream doubleStream = entry.getValue().entrySet().parallelStream()
-                        .mapToDouble(Map.Entry::getValue).filter(e -> e > 0.0);
+                        .mapToDouble(Map.Entry::getValue).filter(e -> e >= 0.0);
 
                 if (needAvgPredicate.test(entry.getKey())) {
                     retMap.put(entry.getKey(), doubleStream.average().getAsDouble());

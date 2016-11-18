@@ -36,7 +36,7 @@ public class HttpClientFactory {
         httpClient = HttpClientBuilder.create()
                 .setDefaultRequestConfig(requestConfig)
                 .setConnectionManager(poolingHttpClientConnectionManager)
-                .setUserAgent("Nestia Monitor Server")
+                .setUserAgent("BBAE Monitor Server")
                 .setKeepAliveStrategy(connectionKeepAliveStrategy)
                 .build();
     }

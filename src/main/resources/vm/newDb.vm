@@ -164,12 +164,30 @@
 },
 "datasource": null,
 "hide": 0,
-"includeAll": true,
-"multi": true,
-"name": "metric_name",
-"options": ${metric_selector_option},
+"includeAll": false,
+"multi": false,
+"name": "row_shards",
+"options": [],
 "query": "${domain_name_query}.$domain_name.*",
 "refresh": 1,
+"regex": "/([^_]+).*/",
+"type": "query",
+"allValue": "*"
+},
+{
+"allValue": "*",
+"current": {
+"text": "a",
+"value": "a"
+},
+"datasource": null,
+"hide": 0,
+"includeAll": false,
+"multi": true,
+"name": "metric_name",
+"options": [],
+"query": "${domain_name_query}.$domain_name.$row_shards\\\\_*",
+"refresh": 2,
 "type": "query",
 "allValue": "*"
 }

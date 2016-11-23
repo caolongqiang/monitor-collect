@@ -9,8 +9,8 @@ import com.jimu.common.jmonitor.JMonitor;
 import com.jimu.monitor.collect.bean.Domain;
 import com.jimu.monitor.collect.bean.Group;
 import com.jimu.monitor.collect.monitorkeeper.EtcdGroupConfigKeeper;
-import com.jimu.monitor.utils.HttpClientHelper;
 import com.jimu.monitor.utils.JsonUtils;
+import com.jimu.monitor.utils.http.HttpClients;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -71,7 +71,8 @@ public class EtcdResultContainer {
     @Scheduled(cron = "1 */5 * * * ?") // 每5分钟的第1s执行一次
     public void refreshJob() {
         try {
-            List<Group> allGroups = crawlGroupListInETCD();
+            List<Group> allGroups = crawlGroupListInETCD(config.getBBAEEtcdContentApi());
+            allGroups.addAll(crawlGroupListInETCD(config.getJimuEtcdContentApi()));
             ar.set(allGroups);
             log.info("got {} jobs in etcd", allGroups.size());
             JMonitor.recordSize("job_in_etcd", allGroups.size());
@@ -116,13 +117,13 @@ public class EtcdResultContainer {
      * 
      * @return
      */
-    private List<Group> crawlGroupListInETCD() {
+    private List<Group> crawlGroupListInETCD(String url) {
         Stopwatch stopwatch = Stopwatch.createStarted();
 
-        String content = HttpClientHelper.get(config.getEtcdContentApi());
-        etcdLog.info("crawl ectd api {}, content:{}", config.getEtcdContentApi(), content);
+        String content = HttpClients.syncClient().get(url).getContent();
+        etcdLog.info("crawl ectd api {}, content:{}", url, content);
         if (content == null) {
-            log.warn("error in get etcd api content. content is null. api address is:{}", config.getEtcdContentApi());
+            log.warn("error in get etcd api content. content is null. api address is:{}", url);
             JMonitor.recordSize("etcd api size", 0);
             return Lists.newArrayList();
         }
@@ -134,7 +135,7 @@ public class EtcdResultContainer {
         });
 
         if (CollectionUtils.isEmpty(etcdResultList)) {
-            log.warn("error in get etcd api content. api address is:{}, 不能使用json 反序列化.", config.getEtcdContentApi());
+            log.warn("error in get etcd api content. api address is:{}, 不能使用json 反序列化.", url);
             JMonitor.recordOne("etcd content error");
             return Lists.newArrayList();
         }

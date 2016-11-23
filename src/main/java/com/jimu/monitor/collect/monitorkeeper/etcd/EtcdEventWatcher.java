@@ -1,6 +1,7 @@
 package com.jimu.monitor.collect.monitorkeeper.etcd;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.jimu.common.jmonitor.JMonitor;
 import com.jimu.monitor.utils.ApplicationContextHelper;
 import com.jimu.monitor.utils.JsonUtils;
@@ -16,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -54,29 +57,43 @@ public class EtcdEventWatcher {
     private final static AsyncHttpClient client = new AsyncHttpClient(asyncConfig);
 
     // 单例
-    private final static WatchWorker watchWorker = new EtcdEventWatcher().new WatchWorker();
+    private final static WatchWorker jimuWatchWorker = new EtcdEventWatcher().new WatchWorker(config.getJimuEtcdEventApi());
+    private final static WatchWorker bbaeWatchWorker = new EtcdEventWatcher().new WatchWorker(config.getBBAEEtcdEventApi());
+
+    private static Map<String, WatchWorker> watcherWorkMap = Maps.newHashMap();
 
     public void watch() {
-        workerExecutor.schedule(watchWorker, INIT_DELAY_IN_MS, TimeUnit.MILLISECONDS);
+        watcherWorkMap.put(config.getJimuEtcdEventApi(), jimuWatchWorker);
+        watcherWorkMap.put(config.getBBAEEtcdEventApi(), bbaeWatchWorker);
+
+        workerExecutor.schedule(jimuWatchWorker, INIT_DELAY_IN_MS, TimeUnit.MILLISECONDS);
+        workerExecutor.schedule(bbaeWatchWorker, INIT_DELAY_IN_MS, TimeUnit.MILLISECONDS);
     }
 
     /**
      * 监控url 内容的worker 如果push过来的content满足要求时, 会开一个线程, 在另外一个线程里,reload 全量etcd数据
      */
     class WatchWorker implements Runnable {
+
         private volatile boolean running = false;
+
+        private String url;
+
+        public WatchWorker(String url) {
+            this.url = url;
+        }
 
         @Override
         public void run() {
             if (running) {
                 log.debug("task is running. exists");
-                workerExecutor.schedule(watchWorker, WORKER_DELAY_TIME_IN_SECOND, TimeUnit.SECONDS);
+                workerExecutor.schedule(watcherWorkMap.get(url), WORKER_DELAY_TIME_IN_SECOND, TimeUnit.SECONDS);
                 return;
             }
 
             running = true;
 
-            client.prepareGet(config.getEtcdEventApi()).execute(new AsyncHandler() {
+            client.prepareGet(url).execute(new AsyncHandler() {
                 @Override
                 public STATE onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception {
                     dealContent(bodyPart);
@@ -98,7 +115,7 @@ public class EtcdEventWatcher {
                 public Object onCompleted() throws Exception {
                     running = false;
                     JMonitor.recordOne("etcd_watcher_on_complete");
-                    workerExecutor.schedule(watchWorker, WORKER_DELAY_TIME_IN_SECOND, TimeUnit.SECONDS);
+                    workerExecutor.schedule(watcherWorkMap.get(url), WORKER_DELAY_TIME_IN_SECOND, TimeUnit.SECONDS);
                     return null;
                 }
 
@@ -108,7 +125,7 @@ public class EtcdEventWatcher {
                     running = false;
                     log.warn("on throwable. change running to false", t);
                     JMonitor.recordOne("etcd_watcher_on_throwable");
-                    workerExecutor.schedule(watchWorker, WORKER_DELAY_TIME_IN_SECOND, TimeUnit.SECONDS);
+                    workerExecutor.schedule(watcherWorkMap.get(url), WORKER_DELAY_TIME_IN_SECOND, TimeUnit.SECONDS);
                 }
             });
         }
@@ -136,15 +153,21 @@ public class EtcdEventWatcher {
                 return;
             }
             log.info("deal content. content:{}", content);
-            EventBody eventBody = JsonUtils.readValue(content, EventBody.class);
-            if (eventBody == null) {
-                JMonitor.recordOne("error event body.");
-                log.warn("error in parse event body. content is:{}", content);
-                return;
-            }
 
-            if (!eventBody.shouldReload()) {
-                log.info("正确收到eventbody. 但是不需要执行refresh操作, exists, content:{}", content);
+            try {
+                EventBody eventBody = JsonUtils.readValue(content, EventBody.class);
+                if (eventBody == null) {
+                    JMonitor.recordOne("error event body.");
+                    log.warn("error in parse event body. content is:{}", content);
+                    return;
+                }
+
+                if (!eventBody.shouldReload()) {
+                    log.info("正确收到eventbody. 但是不需要执行refresh操作, exists, content:{}", content);
+                    return;
+                }
+            } catch (Throwable t) {
+                log.warn("content exchange to EventBody exception, content:" + content, t);
                 return;
             }
 

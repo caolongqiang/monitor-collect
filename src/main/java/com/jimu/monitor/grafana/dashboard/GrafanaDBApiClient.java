@@ -1,17 +1,10 @@
 package com.jimu.monitor.grafana.dashboard;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.jimu.monitor.utils.HttpClientFactory;
 import com.jimu.monitor.utils.HttpClientHelper;
 import com.jimu.monitor.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
 
 import java.util.Map;
 

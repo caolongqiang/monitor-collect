@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.jimu.common.jmonitor.JMonitor;
 import com.jimu.monitor.collect.bean.Domain;
@@ -27,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -71,8 +73,10 @@ public class EtcdResultContainer {
     @Scheduled(cron = "1 */5 * * * ?") // 每5分钟的第1s执行一次
     public void refreshJob() {
         try {
-            List<Group> allGroups = crawlGroupListInETCD(config.getBBAEEtcdContentApi());
-            allGroups.addAll(crawlGroupListInETCD(config.getJimuEtcdContentApi()));
+            List<EtcdResult> etcdResult = crawlGroupListInETCD(config.getBBAEEtcdContentApi());
+            etcdResult.addAll(crawlGroupListInETCD(config.getJimuEtcdContentApi()));
+
+            List<Group> allGroups = etcdListToGroupList(etcdResult);
             ar.set(allGroups);
             log.info("got {} jobs in etcd", allGroups.size());
             JMonitor.recordSize("job_in_etcd", allGroups.size());
@@ -117,7 +121,7 @@ public class EtcdResultContainer {
      * 
      * @return
      */
-    private List<Group> crawlGroupListInETCD(String url) {
+    private List<EtcdResult> crawlGroupListInETCD(String url) {
         Stopwatch stopwatch = Stopwatch.createStarted();
 
         String content = HttpClients.syncClient().get(url).getContent();
@@ -140,7 +144,7 @@ public class EtcdResultContainer {
             return Lists.newArrayList();
         }
 
-        return etcdListToGroupList(etcdResultList);
+        return etcdResultList;
     }
 
     /**

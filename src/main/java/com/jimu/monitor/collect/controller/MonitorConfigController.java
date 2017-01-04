@@ -77,8 +77,8 @@ public class MonitorConfigController {
     }
 
     @RequestMapping("queryWhiteList.j")
-    public @ResponseBody Map queryWhiteList(@RequestParam(defaultValue = "1000") int limit,
-            @RequestParam(defaultValue = "0") int offset) throws Exception {
+    public @ResponseBody Map queryWhiteList(@RequestParam(value = "limit", defaultValue = "1000") int limit,
+            @RequestParam(value = "offset", defaultValue = "0") int offset) throws Exception {
         Map<String, Object> resultMap = Maps.newHashMap();
         List<Filter> filterList = whiteListService.findFilterList(limit, offset);
         resultMap.put("total", whiteListService.countFilterList());
@@ -87,7 +87,7 @@ public class MonitorConfigController {
     }
 
     @RequestMapping("insertFilter.j")
-    public @ResponseBody JsonData insertFilter(@RequestParam String app, @RequestParam String env) {
+    public @ResponseBody JsonData insertFilter(@RequestParam("app") String app, @RequestParam("env") String env) {
         log.info("insert app:{}, env:{}", app, env);
         JMonitor.recordOne("db insert filter");
         try {
@@ -100,7 +100,7 @@ public class MonitorConfigController {
     }
 
     @RequestMapping("updateFilter.j")
-    public @ResponseBody JsonData updateFilter(@RequestParam int id, @RequestParam int status) {
+    public @ResponseBody JsonData updateFilter(@RequestParam("id") int id, @RequestParam("status") int status) {
         JMonitor.recordOne("db update filter");
         log.info("update filter. id:{}, status:{}", id, status);
         try {

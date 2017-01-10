@@ -100,7 +100,7 @@ public class MonitorConfigController {
         log.info("insert app:{}, env:{}, {}", app, env, getUserName());
         JMonitor.recordOne("db insert filter");
         try {
-            whiteListService.insertFilter(app, env);
+            whiteListService.insertFilter(app.trim(), env.trim());
             return JsonData.success("添加成功");
         } catch (Exception e) {
             log.warn("error in insert app:{}, env:{}", app, env, e);

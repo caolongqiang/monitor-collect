@@ -69,12 +69,19 @@ public enum Configs {
         return Integer.parseInt(properties.getProperty("dashboard.refresh.interval", "").trim());
     }
 
-    public String getEtcdContentApi() {
-        return properties.getProperty("etcd.content.api", "").trim();
+    public String getJimuEtcdContentApi() {
+        return properties.getProperty("etcd.jimu.content.api", "").trim();
     }
 
-    public String getEtcdEventApi() {
-        return properties.getProperty("etcd.event.api", "").trim();
+    public String getBBAEEtcdContentApi() {
+        return properties.getProperty("etcd.bbae.content.api", "").trim();
     }
 
+    public String getJimuEtcdEventApi() {
+        return properties.getProperty("etcd.jimu.event.api", "").trim();
+    }
+
+    public String getBBAEEtcdEventApi() {
+        return properties.getProperty("etcd.bbae.event.api", "").trim();
+    }
 }

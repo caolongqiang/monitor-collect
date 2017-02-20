@@ -4,13 +4,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.jimu.common.jmonitor.JMonitor;
 import com.jimu.monitor.collect.bean.Domain;
 import com.jimu.monitor.collect.bean.Group;
 import com.jimu.monitor.collect.monitorkeeper.EtcdGroupConfigKeeper;
-import com.jimu.monitor.utils.HttpClientHelper;
 import com.jimu.monitor.utils.JsonUtils;
+import com.jimu.monitor.utils.http.HttpClients;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -27,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -71,7 +73,10 @@ public class EtcdResultContainer {
     @Scheduled(cron = "1 */5 * * * ?") // 每5分钟的第1s执行一次
     public void refreshJob() {
         try {
-            List<Group> allGroups = crawlGroupListInETCD();
+            List<EtcdResult> etcdResult = crawlGroupListInETCD(config.getBBAEEtcdContentApi());
+            etcdResult.addAll(crawlGroupListInETCD(config.getJimuEtcdContentApi()));
+
+            List<Group> allGroups = etcdListToGroupList(etcdResult);
             ar.set(allGroups);
             log.info("got {} jobs in etcd", allGroups.size());
             JMonitor.recordSize("job_in_etcd", allGroups.size());
@@ -116,13 +121,13 @@ public class EtcdResultContainer {
      * 
      * @return
      */
-    private List<Group> crawlGroupListInETCD() {
+    private List<EtcdResult> crawlGroupListInETCD(String url) {
         Stopwatch stopwatch = Stopwatch.createStarted();
 
-        String content = HttpClientHelper.get(config.getEtcdContentApi());
-        etcdLog.info("crawl ectd api {}, content:{}", config.getEtcdContentApi(), content);
+        String content = HttpClients.syncClient().get(url).getContent();
+        etcdLog.info("crawl ectd api {}, content:{}", url, content);
         if (content == null) {
-            log.warn("error in get etcd api content. content is null. api address is:{}", config.getEtcdContentApi());
+            log.warn("error in get etcd api content. content is null. api address is:{}", url);
             JMonitor.recordSize("etcd api size", 0);
             return Lists.newArrayList();
         }
@@ -134,12 +139,12 @@ public class EtcdResultContainer {
         });
 
         if (CollectionUtils.isEmpty(etcdResultList)) {
-            log.warn("error in get etcd api content. api address is:{}, 不能使用json 反序列化.", config.getEtcdContentApi());
+            log.warn("error in get etcd api content. api address is:{}, 不能使用json 反序列化.", url);
             JMonitor.recordOne("etcd content error");
             return Lists.newArrayList();
         }
 
-        return etcdListToGroupList(etcdResultList);
+        return etcdResultList;
     }
 
     /**

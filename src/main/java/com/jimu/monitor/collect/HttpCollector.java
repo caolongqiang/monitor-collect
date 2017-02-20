@@ -8,6 +8,7 @@ import com.jimu.common.jmonitor.JMonitor;
 import com.jimu.monitor.collect.bean.Domain;
 import com.jimu.monitor.collect.bean.Packet;
 import com.jimu.monitor.utils.HttpClientHelper;
+import com.jimu.monitor.utils.http.HttpClients;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -52,7 +53,7 @@ public class HttpCollector implements Collector {
         Packet packet = Packet.builder().domain(domain).build();
 
         CompletableFuture<Packet> packetFuture =  CompletableFuture.supplyAsync(() -> {
-            String content = HttpClientHelper.get(domain.getUrl()); // 检查过url 和domain都不为空. 不会出现NPE
+            String content = HttpClients.syncClient().get(domain.getUrl()).getContent(); // 检查过url 和domain都不为空. 不会出现NPE
             packet.setContent(content);
             packet.setDuration(System.currentTimeMillis() - packet.getTimestamp());
             packet.setRawMeasurements(parse(content));

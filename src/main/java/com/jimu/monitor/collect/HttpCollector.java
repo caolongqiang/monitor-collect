@@ -10,10 +10,13 @@ import com.jimu.monitor.collect.bean.Packet;
 import com.jimu.monitor.utils.HttpClientHelper;
 import com.jimu.monitor.utils.http.HttpClients;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.DoubleAccumulator;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -70,11 +73,32 @@ public class HttpCollector implements Collector {
 
     private Map<String, Double> parse(String content) {
         checkNotNull(content);
-        Map<String, String> map = Splitter.on("\n").omitEmptyStrings().trimResults().withKeyValueSeparator("=")
-                .split(content);
+        log.debug("parse content:{}" , content);
+        Map<String, Double> resultMap = Maps.newHashMap();
+        Iterable<String> line = Splitter.on("\n").omitEmptyStrings().trimResults().split(content);
+        int FIXED_LENGTH = 2;
+        line.forEach(l -> {
+            String[] strArray = StringUtils.split(l, "=");
+            if (strArray.length == FIXED_LENGTH) {
+                try {
+                    String key = strArray[0].trim();
+                    Double value = Double.valueOf(strArray[1]);
+                    resultMap.put(key, value);
+                } catch (NumberFormatException e) {
+                    log.error("error in parse value:{}, key:{}, domain:{}", strArray[1], strArray[0], domain);
+                }
+            }
+        });
 
-        return Maps.transformEntries(map, (String key, String value) -> Double.valueOf(value));
 
+        return resultMap;
+
+    }
+
+    public static void main(String[] args) {
+        String content = "http://www.prnasia.com/m/mediafeed/rss?id=1223_failure_Count=0\na=89\nccc=zx";
+        Map map = new HttpCollector(null).parse(content);
+        System.err.println("map size:{}" + map.size());
     }
 
 }

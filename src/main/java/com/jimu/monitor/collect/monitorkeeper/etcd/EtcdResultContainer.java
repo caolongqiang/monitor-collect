@@ -74,7 +74,6 @@ public class EtcdResultContainer {
     public void refreshJob() {
         try {
             List<EtcdResult> etcdResult = crawlGroupListInETCD(config.getBBAEEtcdContentApi());
-            etcdResult.addAll(crawlGroupListInETCD(config.getJimuEtcdContentApi()));
 
             List<Group> allGroups = etcdListToGroupList(etcdResult);
             ar.set(allGroups);

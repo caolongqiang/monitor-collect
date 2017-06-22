@@ -68,17 +68,8 @@ public enum Configs {
     public int getDbRefreshIntervalInMin() {
         return Integer.parseInt(properties.getProperty("dashboard.refresh.interval", "").trim());
     }
-
-    public String getJimuEtcdContentApi() {
-        return properties.getProperty("etcd.jimu.content.api", "").trim();
-    }
-
     public String getBBAEEtcdContentApi() {
         return properties.getProperty("etcd.bbae.content.api", "").trim();
-    }
-
-    public String getJimuEtcdEventApi() {
-        return properties.getProperty("etcd.jimu.event.api", "").trim();
     }
 
     public String getBBAEEtcdEventApi() {

@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -57,16 +56,13 @@ public class EtcdEventWatcher {
     private final static AsyncHttpClient client = new AsyncHttpClient(asyncConfig);
 
     // 单例
-    private final static WatchWorker jimuWatchWorker = new EtcdEventWatcher().new WatchWorker(config.getJimuEtcdEventApi());
     private final static WatchWorker bbaeWatchWorker = new EtcdEventWatcher().new WatchWorker(config.getBBAEEtcdEventApi());
 
     private static Map<String, WatchWorker> watcherWorkMap = Maps.newHashMap();
 
     public void watch() {
-        watcherWorkMap.put(config.getJimuEtcdEventApi(), jimuWatchWorker);
         watcherWorkMap.put(config.getBBAEEtcdEventApi(), bbaeWatchWorker);
 
-        workerExecutor.schedule(jimuWatchWorker, INIT_DELAY_IN_MS, TimeUnit.MILLISECONDS);
         workerExecutor.schedule(bbaeWatchWorker, INIT_DELAY_IN_MS, TimeUnit.MILLISECONDS);
     }
 

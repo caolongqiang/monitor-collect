@@ -73,7 +73,7 @@ Grafana 是一款开源的图形控制台, 展示 Graphite 的数据和图片
 可以用 http://机器名:端口号/_metrics/metrics.do 看到机器的监控数据
 
 #### 三 写一个配置文件(json格式)
-把配置文件 提交给zhenbao.zhou@jimu.com
+把配置文件 提交给管理员
 ```
 {
   "name": "groupname2",   // 服务组的名字

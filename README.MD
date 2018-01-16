@@ -152,7 +152,7 @@ JMonitor.recordSize("Thread_num",200);  // 底层记录为 Thread_num_value.
 
 ## 如何看图
 - grafana的url地址:
-   http://monitor.jimubox.com/.
+   http://monitor.com/.
 
 - dashboard的名字
 ![dashboard的名字][6]

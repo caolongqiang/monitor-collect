@@ -1,9 +1,0 @@
-{
-  "name":"food_audit",
-  "domainList":[
-    {
-      "host":"audit.food.jimu.com",
-      "url":"http://54.169.197.33/monitor.jsp"
-    }
-  ]
-}
